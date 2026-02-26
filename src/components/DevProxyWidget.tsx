@@ -36,6 +36,7 @@ export function DevProxyWidget() {
   const [interceptors, setInterceptors] = useState<Interceptor[]>([]);
   const [requests, setRequests] = useState<RequestLog[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [interceptorEdited, setInterceptorEdited] =
     useState<Interceptor | null>(null);
   const [responseText, setResponseText] = useState<string>("");
@@ -80,6 +81,23 @@ export function DevProxyWidget() {
     } catch (err) {
       console.debug("debug:loadRequests", err);
     }
+  };
+
+  const createInterceptor = async (
+    path: string,
+    querykey: string[],
+    response: object,
+  ) => {
+    await fetch(`${PROXY_URL}/__interceptors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        path,
+        querykey,
+        response,
+      }),
+    });
+    loadInterceptors();
   };
 
   // Toggle interceptor
@@ -174,6 +192,24 @@ export function DevProxyWidget() {
                   Requests
                 </button>
               </div>
+<button
+  className="new-btn"
+  onClick={() => {
+    setIsCreating(true);
+    setInterceptorEdited({
+      id: "new",
+      enabled: true,
+      method: "ANY",
+      path: "",
+      querykey: [],
+      response: { status: 200, body: {} },
+    });
+    setResponseText(JSON.stringify({ status: 200, body: {} }, null, 2));
+    setJsonError(false);
+  }}
+>
+  + New
+</button>
               <button className="close-btn" onClick={() => setIsOpen(false)}>
                 x
               </button>
@@ -273,11 +309,28 @@ export function DevProxyWidget() {
                       try {
                         const parsed = JSON.parse(responseText);
                         setJsonError(false);
-                        updateInterceptor(
+                        if (isCreating) {
+                          await createInterceptor(
+                            interceptorEdited.path,
+                            interceptorEdited.querykey,
+                            parsed,
+                          );
+                          setIsCreating(false);
+                        } else {
+                          await updateInterceptor(
+                            interceptorEdited.id,
+                            interceptorEdited.path,
+                            parsed,
+                          );
+                        }
+                        setInterceptorEdited(null);
+                        /*
+                          updateInterceptor(
                           interceptorEdited.id,
                           interceptorEdited.path,
                           parsed,
-                        );
+                          );
+                         */
                       } catch {
                         setJsonError(true);
                       }
