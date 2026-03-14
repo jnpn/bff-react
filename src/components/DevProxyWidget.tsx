@@ -269,6 +269,21 @@ export function DevProxyWidget() {
                       >
                         Edit
                       </span>
+                      <span
+                        className="status status-2 cursor-pointer ml-1"
+                        title="Clone Interceptor"
+                        onClick={() => {
+                          setIsCreating(true);
+                          setInterceptorEdited({
+                            ...i,
+                            id: "new",
+                          });
+                          setResponseText(JSON.stringify(i.response, null, 2));
+                          setJsonError(false);
+                        }}
+                      >
+                        Clone
+                      </span>
                       <span>key {i.querykey || "none"}</span>
                     </div>
                     <button onClick={() => deleteInterceptor(i.id)}>🗑️</button>
