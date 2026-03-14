@@ -40,7 +40,7 @@ export function DevProxyWidget() {
   const [interceptorEdited, setInterceptorEdited] =
     useState<Interceptor | null>(null);
   const [responseText, setResponseText] = useState<string>("");
-  const [jsonError, setJsonError] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const queryClient = useQueryClient();
 
@@ -138,6 +138,40 @@ export function DevProxyWidget() {
     loadInterceptors();
   };
 
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!interceptorEdited) return false;
+
+    if (!interceptorEdited.path || interceptorEdited.path.trim() === "") {
+      newErrors.path = "Path is required";
+    } else if (!interceptorEdited.path.startsWith("/")) {
+      newErrors.path = "Path must start with /";
+    }
+
+    if (
+      !interceptorEdited.querykey ||
+      interceptorEdited.querykey.some((k) => k.trim() === "")
+    ) {
+      newErrors.querykey = "All query keys must be non-empty strings";
+    }
+
+    if (
+      interceptorEdited.response.status < 100 ||
+      interceptorEdited.response.status > 599
+    ) {
+      newErrors.status = "Status must be between 100 and 599";
+    }
+
+    try {
+      JSON.parse(responseText);
+    } catch {
+      newErrors.body = "Invalid JSON body";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // Apply scenario
   const applyScenario = async (name: string) => {
     await fetch(`${PROXY_URL}/__scenarios/${name}/apply`, { method: "POST" });
@@ -198,7 +232,7 @@ export function DevProxyWidget() {
       response: { status: 200, body: {} },
     });
     setResponseText(JSON.stringify({ status: 200, body: {} }, null, 2));
-    setJsonError(false);
+    setErrors({});
   }}
 >
   + New
@@ -254,9 +288,10 @@ export function DevProxyWidget() {
                             setResponseText(
                               JSON.stringify(i.response.body, null, 2),
                             );
-                            setJsonError(false);
+                            setErrors({});
                           } else {
                             setInterceptorEdited(null);
+                            setErrors({});
                           }
                         }}
                       >
@@ -272,7 +307,7 @@ export function DevProxyWidget() {
                             id: "new",
                           });
                           setResponseText(JSON.stringify(i.response.body, null, 2));
-                          setJsonError(false);
+                          setErrors({});
                         }}
                       >
                         Clone
@@ -313,11 +348,11 @@ export function DevProxyWidget() {
               <div className="m-2 mt-2 mb-0 p-2 rounded border border-white/20 h-[95%] interceptor-editor">
                 <div className="actions">
                   <span
-                    className="save rounded font-semibold text-white px-1 hover:bg-gray-500 bg-gray-600"
+                    className={`save rounded font-semibold text-white px-1 ${Object.keys(errors).length > 0 ? "opacity-50 cursor-not-allowed grayscale" : "hover:bg-gray-500 bg-gray-600 cursor-pointer"}`}
                     onClick={async () => {
+                      if (!validate()) return;
                       try {
                         const parsedBody = JSON.parse(responseText);
-                        setJsonError(false);
                         
                         const payload = {
                           method: interceptorEdited.method,
@@ -340,9 +375,9 @@ export function DevProxyWidget() {
                           );
                         }
                         setInterceptorEdited(null);
+                        setErrors({});
                       } catch (e) {
                         console.error("Save error", e);
-                        setJsonError(true);
                       }
                     }}
                   >
@@ -355,38 +390,40 @@ export function DevProxyWidget() {
                     <label className="mr-2 my-1 text-white font-semibold">
                       method
                     </label>
-                    <select
-                      className="bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
-                      value={interceptorEdited.method || "ANY"}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setInterceptorEdited((prev) =>
-                          prev ? { ...prev, method: v } : prev,
-                        );
-                      }}
-                    >
-                      <option value="ANY">ANY</option>
-                      <option value="GET">GET</option>
-                      <option value="POST">POST</option>
-                      <option value="PUT">PUT</option>
-                      <option value="DELETE">DELETE</option>
-                      <option value="PATCH">PATCH</option>
-                    </select>
-
-                    <label className="ml-4 mr-2 my-1 text-white font-semibold flex items-center">
-                      <input
-                        type="checkbox"
-                        className="mr-2"
-                        checked={interceptorEdited.isRegex || false}
+                    <div className="flex items-center gap-4">
+                      <select
+                        className="bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                        value={interceptorEdited.method || "ANY"}
                         onChange={(e) => {
-                          const v = e.target.checked;
+                          const v = e.target.value;
                           setInterceptorEdited((prev) =>
-                            prev ? { ...prev, isRegex: v } : prev,
+                            prev ? { ...prev, method: v } : prev,
                           );
                         }}
-                      />
-                      regex
-                    </label>
+                      >
+                        <option value="ANY">ANY</option>
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                      </select>
+
+                      <label className="mr-2 my-1 text-white font-semibold flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="mr-2"
+                          checked={interceptorEdited.isRegex || false}
+                          onChange={(e) => {
+                            const v = e.target.checked;
+                            setInterceptorEdited((prev) =>
+                              prev ? { ...prev, isRegex: v } : prev,
+                            );
+                          }}
+                        />
+                        regex
+                      </label>
+                    </div>
                   </div>
 
                   <div className="interceptor-field path">
@@ -394,7 +431,7 @@ export function DevProxyWidget() {
                       path
                     </label>
                     <input
-                      className="w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.path ? "border-red-500" : "border-white/20"}`}
                       type="text"
                       value={interceptorEdited.path}
                       onChange={(e) => {
@@ -402,8 +439,10 @@ export function DevProxyWidget() {
                         setInterceptorEdited((prev) =>
                           prev ? { ...prev, path: v } : prev,
                         );
+                        if (errors.path) validate();
                       }}
                     />
+                    {errors.path && <span className="text-red-400 text-[10px] mt-1">{errors.path}</span>}
                   </div>
 
                   <div className="interceptor-field key">
@@ -411,49 +450,57 @@ export function DevProxyWidget() {
                       querykey
                     </label>
                     <input
-                      className="w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.querykey ? "border-red-500" : "border-white/20"}`}
                       type="text"
                       placeholder="key1, key2"
                       value={interceptorEdited.querykey ? interceptorEdited.querykey.join(',') : ""}
                       onChange={(e) => {
                         const v = e.target.value;
                         setInterceptorEdited((prev) =>
-                          prev ? { ...prev, querykey: v.split(',').map(s => s.trim()).filter(Boolean) } : prev,
+                          prev ? { ...prev, querykey: v.split(',').map(s => s.trim()) } : prev,
                         );
+                        if (errors.querykey) validate();
                       }}
                     />
+                    {errors.querykey && <span className="text-red-400 text-[10px] mt-1">{errors.querykey}</span>}
                   </div>
 
                   <div className="interceptor-field response-meta">
-                    <label className="mr-2 my-1 text-white font-semibold">
-                      status
-                    </label>
-                    <input
-                      className="w-20 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
-                      type="number"
-                      value={interceptorEdited.response.status}
-                      onChange={(e) => {
-                        const v = parseInt(e.target.value, 10);
-                        setInterceptorEdited((prev) =>
-                          prev ? { ...prev, response: { ...prev.response, status: v } } : prev,
-                        );
-                      }}
-                    />
+                    <div className="flex flex-col flex-1">
+                      <label className="mr-2 my-1 text-white font-semibold">
+                        status
+                      </label>
+                      <input
+                        className={`w-20 bg-gray-800 text-white border rounded px-2 py-1 ${errors.status ? "border-red-500" : "border-white/20"}`}
+                        type="number"
+                        value={interceptorEdited.response.status}
+                        onChange={(e) => {
+                          const v = parseInt(e.target.value, 10);
+                          setInterceptorEdited((prev) =>
+                            prev ? { ...prev, response: { ...prev.response, status: v } } : prev,
+                          );
+                          if (errors.status) validate();
+                        }}
+                      />
+                      {errors.status && <span className="text-red-400 text-[10px] mt-1">{errors.status}</span>}
+                    </div>
 
-                    <label className="ml-4 mr-2 my-1 text-white font-semibold">
-                      delay (ms)
-                    </label>
-                    <input
-                      className="w-24 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
-                      type="number"
-                      value={interceptorEdited.response.delayMs || 0}
-                      onChange={(e) => {
-                        const v = parseInt(e.target.value, 10);
-                        setInterceptorEdited((prev) =>
-                          prev ? { ...prev, response: { ...prev.response, delayMs: v } } : prev,
-                        );
-                      }}
-                    />
+                    <div className="flex flex-col flex-1">
+                      <label className="mr-2 my-1 text-white font-semibold">
+                        delay (ms)
+                      </label>
+                      <input
+                        className="w-24 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                        type="number"
+                        value={interceptorEdited.response.delayMs || 0}
+                        onChange={(e) => {
+                          const v = parseInt(e.target.value, 10);
+                          setInterceptorEdited((prev) =>
+                            prev ? { ...prev, response: { ...prev.response, delayMs: v } } : prev,
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div className="interceptor-field response-body h-full flex flex-col">
@@ -464,15 +511,16 @@ export function DevProxyWidget() {
                       cols={60}
                       rows={12}
                       className={
-                        (jsonError ? "border-red-500" : "border-white/20") + 
+                        (errors.body ? "border-red-500" : "border-white/20") + 
                         " w-full bg-gray-800 text-white border rounded px-2 py-1 font-mono text-xs flex-1"
                       }
                       value={responseText}
                       onChange={(e) => {
                         setResponseText(e.target.value);
-                        setJsonError(false);
+                        if (errors.body) validate();
                       }}
                     />
+                    {errors.body && <span className="text-red-400 text-[10px] mt-1">{errors.body}</span>}
                   </div>
                 </div>
               </div>
