@@ -4,6 +4,7 @@ import "./DevProxyWidget.css";
 import { useQueryClient } from "@tanstack/react-query";
 
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || "http://localhost:3000";
+const METHODS = ["ANY", "GET", "POST", "PUT", "DELETE", "PATCH"];
 
 interface Interceptor {
   id: string;
@@ -39,8 +40,42 @@ export function DevProxyWidget() {
   const [isCreating, setIsCreating] = useState(false);
   const [interceptorEdited, setInterceptorEdited] =
     useState<Interceptor | null>(null);
+  const [initialInterceptor, setInitialInterceptor] =
+    useState<Interceptor | null>(null);
   const [responseText, setResponseText] = useState<string>("");
+  const [initialResponseText, setInitialResponseText] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showSavedFeedback, setShowSavedFeedback] = useState(false);
+
+  const isDirty = (() => {
+    if (!interceptorEdited || !initialInterceptor) return false;
+
+    const methodChanged =
+      (interceptorEdited.method || "ANY") !==
+      (initialInterceptor.method || "ANY");
+    const pathChanged = interceptorEdited.path !== initialInterceptor.path;
+    const isRegexChanged =
+      !!interceptorEdited.isRegex !== !!initialInterceptor.isRegex;
+    const statusChanged =
+      interceptorEdited.response.status !== initialInterceptor.response.status;
+    const delayChanged =
+      (interceptorEdited.response.delayMs || 0) !==
+      (initialInterceptor.response.delayMs || 0);
+    const bodyChanged = responseText !== initialResponseText;
+    const querykeyChanged =
+      JSON.stringify(interceptorEdited.querykey || []) !==
+      JSON.stringify(initialInterceptor.querykey || []);
+
+    return (
+      methodChanged ||
+      pathChanged ||
+      isRegexChanged ||
+      statusChanged ||
+      delayChanged ||
+      bodyChanged ||
+      querykeyChanged
+    );
+  })();
 
   const queryClient = useQueryClient();
 
@@ -92,6 +127,41 @@ export function DevProxyWidget() {
       body: JSON.stringify(interceptor),
     });
     loadInterceptors();
+  };
+
+  const handleSave = async () => {
+    if (!interceptorEdited || !validate() || !isDirty) return;
+    try {
+      const parsedBody = JSON.parse(responseText);
+
+      const payload = {
+        method: interceptorEdited.method,
+        path: interceptorEdited.path,
+        querykey: interceptorEdited.querykey,
+        isRegex: interceptorEdited.isRegex,
+        response: {
+          ...interceptorEdited.response,
+          body: parsedBody,
+        },
+      };
+
+      if (isCreating) {
+        await createInterceptor(payload);
+        setIsCreating(false);
+      } else {
+        await updateInterceptor(interceptorEdited.id, payload);
+      }
+      setShowSavedFeedback(true);
+      setTimeout(() => setShowSavedFeedback(false), 2000);
+      setErrors({});
+      setTimeout(() => {
+        setInterceptorEdited(null);
+        setInitialInterceptor(null);
+        setInitialResponseText("");
+      }, 1000);
+    } catch (e) {
+      console.error("Save error", e);
+    }
   };
 
   // Toggle interceptor
@@ -223,15 +293,19 @@ export function DevProxyWidget() {
   className="new-btn"
   onClick={() => {
     setIsCreating(true);
-    setInterceptorEdited({
+    const newI = {
       id: "new",
       enabled: true,
       method: "ANY",
       path: "",
       querykey: [],
       response: { status: 200, body: {} },
-    });
-    setResponseText(JSON.stringify({ status: 200, body: {} }, null, 2));
+    };
+    setInterceptorEdited(newI);
+    setInitialInterceptor(newI);
+    const bodyStr = JSON.stringify({ status: 200, body: {} }, null, 2);
+    setResponseText(bodyStr);
+    setInitialResponseText(bodyStr);
     setErrors({});
   }}
 >
@@ -277,17 +351,18 @@ export function DevProxyWidget() {
                       >
                         {i.response.status}
                       </span>
-                      <span
-                        className={`edit status status-4`}
+                      <button
+                        className="btn btn-action-primary"
                         onClick={() => {
                           if (
                             interceptorEdited === null ||
                             interceptorEdited.id !== i.id
                           ) {
                             setInterceptorEdited(i);
-                            setResponseText(
-                              JSON.stringify(i.response.body, null, 2),
-                            );
+                            setInitialInterceptor(i);
+                            const bodyStr = JSON.stringify(i.response.body, null, 2);
+                            setResponseText(bodyStr);
+                            setInitialResponseText(bodyStr);
                             setErrors({});
                           } else {
                             setInterceptorEdited(null);
@@ -296,26 +371,30 @@ export function DevProxyWidget() {
                         }}
                       >
                         Edit
-                      </span>
-                      <span
-                        className="status status-2 cursor-pointer ml-1"
+                      </button>
+                      <button
+                        className="btn btn-action-secondary"
                         title="Clone Interceptor"
                         onClick={() => {
                           setIsCreating(true);
-                          setInterceptorEdited({
+                          const clonedI = {
                             ...i,
                             id: "new",
-                          });
-                          setResponseText(JSON.stringify(i.response.body, null, 2));
+                          };
+                          setInterceptorEdited(clonedI);
+                          setInitialInterceptor(clonedI);
+                          const bodyStr = JSON.stringify(i.response.body, null, 2);
+                          setResponseText(bodyStr);
+                          setInitialResponseText(bodyStr);
                           setErrors({});
                         }}
                       >
                         Clone
-                      </span>
+                      </button>
                       {i.isRegex && <span className="badge">REGEX</span>}
                       <span>key {i.querykey && i.querykey.length > 0 ? i.querykey.join(',') : "none"}</span>
                     </div>
-                    <button onClick={() => deleteInterceptor(i.id)}>🗑️</button>
+                    <button className="btn btn-danger" onClick={() => deleteInterceptor(i.id)}>🗑️</button>
                   </div>
                 ))}
               </div>
@@ -343,184 +422,202 @@ export function DevProxyWidget() {
               </div>
             )}
           </div>
-          <div className="right">
+          <div className={`right ${interceptorEdited ? "is-editing" : ""}`}>
             {interceptorEdited && (
-              <div className="m-2 mt-2 mb-0 p-2 rounded border border-white/20 h-[95%] interceptor-editor">
-                <div className="actions">
-                  <span
-                    className={`save rounded font-semibold text-white px-1 ${Object.keys(errors).length > 0 ? "opacity-50 cursor-not-allowed grayscale" : "hover:bg-gray-500 bg-gray-600 cursor-pointer"}`}
-                    onClick={async () => {
-                      if (!validate()) return;
-                      try {
-                        const parsedBody = JSON.parse(responseText);
-                        
-                        const payload = {
-                          method: interceptorEdited.method,
-                          path: interceptorEdited.path,
-                          querykey: interceptorEdited.querykey,
-                          isRegex: interceptorEdited.isRegex,
-                          response: {
-                            ...interceptorEdited.response,
-                            body: parsedBody
-                          }
-                        };
-
-                        if (isCreating) {
-                          await createInterceptor(payload);
-                          setIsCreating(false);
-                        } else {
-                          await updateInterceptor(
-                            interceptorEdited.id,
-                            payload
-                          );
+              <div
+                className="m-2 mt-2 mb-0 p-3 rounded border border-white/10 h-[95%] interceptor-editor bg-gray-900/50"
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                    handleSave();
+                  }
+                }}
+              >
+                <div className="editor-header">
+                  <div className="editor-title">
+                    <button
+                      className="btn btn-primary"
+                      disabled={!isDirty || Object.keys(errors).length > 0}
+                      onClick={handleSave}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      style={{ marginLeft: "1em" }}
+                      disabled={!isDirty}
+                      onClick={() => {
+                        if (initialInterceptor) {
+                          setInterceptorEdited({ ...initialInterceptor });
+                          setResponseText(initialResponseText);
+                          setErrors({});
                         }
+                      }}
+                    >
+                      Reset
+                    </button>
+                    {showSavedFeedback && (
+                      <span className="saved-feedback">✓ Saved!</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-[10px] opacity-80 font-semibold font-mono">
+                      {interceptorEdited.id}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => {
                         setInterceptorEdited(null);
                         setErrors({});
-                      } catch (e) {
-                        console.error("Save error", e);
-                      }
-                    }}
-                  >
-                    save
-                  </span>{" "}
-                  <span className="interceptor-id">{interceptorEdited.id}</span>
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
                 <div className="interceptor-fields">
                   <div className="interceptor-field">
-                    <label className="mr-2 my-1 text-white font-semibold">
-                      method
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <select
-                        className="bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
-                        value={interceptorEdited.method || "ANY"}
+                    <label>method</label>
+                    <div className="field-content">
+                      <div className="method-selector flex gap-1 bg-white/5 p-1 rounded-md border border-white/10 w-fit">
+                        {METHODS.map((m) => (
+                          <button
+                            key={m}
+                            className={`btn ${interceptorEdited.method === m || (!interceptorEdited.method && m === "ANY") ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5`}
+                            onClick={() => {
+                              setInterceptorEdited((prev) =>
+                                prev ? { ...prev, method: m } : prev,
+                              );
+                            }}
+                          >
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="interceptor-field">
+                    <label>path</label>
+                    <div className="field-content">
+                      <div className="flex gap-2">
+                        <input
+                          autoFocus
+                          className={`flex-1 bg-gray-800 text-white border rounded px-2 py-1 ${errors.path ? "border-red-500" : "border-white/20"}`}
+                          type="text"
+                          value={interceptorEdited.path}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setInterceptorEdited((prev) =>
+                              prev ? { ...prev, path: v } : prev,
+                            );
+                            if (errors.path) validate();
+                          }}
+                        />
+                        <button
+                          className={`btn ${interceptorEdited.isRegex ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5 h-auto`}
+                          onClick={() => {
+                            setInterceptorEdited((prev) =>
+                              prev ? { ...prev, isRegex: !prev.isRegex } : prev,
+                            );
+                          }}
+                          title="Toggle Regex"
+                        >
+                          .*
+                        </button>
+                      </div>
+                      {errors.path && (
+                        <span className="error-message">{errors.path}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="interceptor-field">
+                    <label>querykey</label>
+                    <div className="field-content">
+                      <input
+                        className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.querykey ? "border-red-500" : "border-white/20"}`}
+                        type="text"
+                        placeholder="key1, key2"
+                        value={interceptorEdited.querykey ? interceptorEdited.querykey.join(',') : ""}
                         onChange={(e) => {
                           const v = e.target.value;
                           setInterceptorEdited((prev) =>
-                            prev ? { ...prev, method: v } : prev,
+                            prev ? { ...prev, querykey: v.split(',').map(s => s.trim()) } : prev,
                           );
+                          if (errors.querykey) validate();
                         }}
-                      >
-                        <option value="ANY">ANY</option>
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                      </select>
+                      />
+                      {errors.querykey && <span className="error-message">{errors.querykey}</span>}
+                    </div>
+                  </div>
 
-                      <label className="mr-2 my-1 text-white font-semibold flex items-center cursor-pointer">
+                  <div style={{ display: "flex" }} className="flex gap-4">
+                    <div className="interceptor-field flex-1">
+                      <label>status</label>
+                      <div className="field-content">
                         <input
-                          type="checkbox"
-                          className="mr-2"
-                          checked={interceptorEdited.isRegex || false}
+                          type="number"
+                          className={`bg-gray-800 text-white border rounded px-2 py-1 text-sm w-full ${errors.status ? "border-red-500" : "border-white/20"}`}
+                          value={interceptorEdited.response.status}
                           onChange={(e) => {
-                            const v = e.target.checked;
+                            const v = parseInt(e.target.value, 10);
                             setInterceptorEdited((prev) =>
-                              prev ? { ...prev, isRegex: v } : prev,
+                              prev
+                                ? {
+                                    ...prev,
+                                    response: { ...prev.response, status: v },
+                                  }
+                                : prev,
+                            );
+                            if (errors.status) validate();
+                          }}
+                        />
+                        {errors.status && (
+                          <span className="error-message">{errors.status}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="interceptor-field flex-1">
+                      <label>delay (ms)</label>
+                      <div className="field-content">
+                        <input
+                          type="number"
+                          className="w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                          value={interceptorEdited.response.delayMs || 0}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value, 10);
+                            setInterceptorEdited((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    response: { ...prev.response, delayMs: v },
+                                  }
+                                : prev,
                             );
                           }}
                         />
-                        regex
-                      </label>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="interceptor-field path">
-                    <label className="mr-2 my-1 text-white font-semibold">
-                      path
-                    </label>
-                    <input
-                      className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.path ? "border-red-500" : "border-white/20"}`}
-                      type="text"
-                      value={interceptorEdited.path}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setInterceptorEdited((prev) =>
-                          prev ? { ...prev, path: v } : prev,
-                        );
-                        if (errors.path) validate();
-                      }}
-                    />
-                    {errors.path && <span className="text-red-400 text-[10px] mt-1">{errors.path}</span>}
-                  </div>
-
-                  <div className="interceptor-field key">
-                    <label className="mr-2 my-1 text-white font-semibold">
-                      querykey
-                    </label>
-                    <input
-                      className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.querykey ? "border-red-500" : "border-white/20"}`}
-                      type="text"
-                      placeholder="key1, key2"
-                      value={interceptorEdited.querykey ? interceptorEdited.querykey.join(',') : ""}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setInterceptorEdited((prev) =>
-                          prev ? { ...prev, querykey: v.split(',').map(s => s.trim()) } : prev,
-                        );
-                        if (errors.querykey) validate();
-                      }}
-                    />
-                    {errors.querykey && <span className="text-red-400 text-[10px] mt-1">{errors.querykey}</span>}
-                  </div>
-
-                  <div className="interceptor-field response-meta">
-                    <div className="flex flex-col flex-1">
-                      <label className="mr-2 my-1 text-white font-semibold">
-                        status
-                      </label>
-                      <input
-                        className={`w-20 bg-gray-800 text-white border rounded px-2 py-1 ${errors.status ? "border-red-500" : "border-white/20"}`}
-                        type="number"
-                        value={interceptorEdited.response.status}
+                  <div className="interceptor-field vertical">
+                    <label>body (JSON)</label>
+                    <div className="field-content">
+                      <textarea
+                        className={`w-full bg-gray-800 text-white border rounded p-2 text-xs font-mono h-40 ${errors.body ? "border-red-500" : "border-white/20"}`}
+                        value={responseText}
                         onChange={(e) => {
-                          const v = parseInt(e.target.value, 10);
-                          setInterceptorEdited((prev) =>
-                            prev ? { ...prev, response: { ...prev.response, status: v } } : prev,
-                          );
-                          if (errors.status) validate();
+                          setResponseText(e.target.value);
+                          if (errors.body) validate();
                         }}
                       />
-                      {errors.status && <span className="text-red-400 text-[10px] mt-1">{errors.status}</span>}
+                      {errors.body && (
+                        <span className="error-message">{errors.body}</span>
+                      )}
                     </div>
-
-                    <div className="flex flex-col flex-1">
-                      <label className="mr-2 my-1 text-white font-semibold">
-                        delay (ms)
-                      </label>
-                      <input
-                        className="w-24 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
-                        type="number"
-                        value={interceptorEdited.response.delayMs || 0}
-                        onChange={(e) => {
-                          const v = parseInt(e.target.value, 10);
-                          setInterceptorEdited((prev) =>
-                            prev ? { ...prev, response: { ...prev.response, delayMs: v } } : prev,
-                          );
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="interceptor-field response-body h-full flex flex-col">
-                    <label className="mr-2 my-1 text-white font-semibold">
-                      body (JSON)
-                    </label>
-                    <textarea
-                      cols={60}
-                      rows={12}
-                      className={
-                        (errors.body ? "border-red-500" : "border-white/20") + 
-                        " w-full bg-gray-800 text-white border rounded px-2 py-1 font-mono text-xs flex-1"
-                      }
-                      value={responseText}
-                      onChange={(e) => {
-                        setResponseText(e.target.value);
-                        if (errors.body) validate();
-                      }}
-                    />
-                    {errors.body && <span className="text-red-400 text-[10px] mt-1">{errors.body}</span>}
                   </div>
                 </div>
               </div>
