@@ -84,18 +84,12 @@ export function DevProxyWidget() {
   };
 
   const createInterceptor = async (
-    path: string,
-    querykey: string[],
-    response: object,
+    interceptor: Partial<Interceptor>
   ) => {
     await fetch(`${PROXY_URL}/__interceptors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        path,
-        querykey,
-        response,
-      }),
+      body: JSON.stringify(interceptor),
     });
     loadInterceptors();
   };
@@ -114,14 +108,12 @@ export function DevProxyWidget() {
   // Update interceptor
   const updateInterceptor = async (
     id: string,
-    path: string,
-    querykey: string[],
-    response: object,
+    updates: Partial<Interceptor>
   ) => {
     await fetch(`${PROXY_URL}/__interceptors/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path, querykey, response }),
+      body: JSON.stringify(updates),
     });
     invalidateInterceptorLocally(id);
     loadInterceptors();
@@ -260,7 +252,7 @@ export function DevProxyWidget() {
                           ) {
                             setInterceptorEdited(i);
                             setResponseText(
-                              JSON.stringify(i.response, null, 2),
+                              JSON.stringify(i.response.body, null, 2),
                             );
                             setJsonError(false);
                           } else {
@@ -279,13 +271,14 @@ export function DevProxyWidget() {
                             ...i,
                             id: "new",
                           });
-                          setResponseText(JSON.stringify(i.response, null, 2));
+                          setResponseText(JSON.stringify(i.response.body, null, 2));
                           setJsonError(false);
                         }}
                       >
                         Clone
                       </span>
-                      <span>key {i.querykey || "none"}</span>
+                      {i.isRegex && <span className="badge">REGEX</span>}
+                      <span>key {i.querykey && i.querykey.length > 0 ? i.querykey.join(',') : "none"}</span>
                     </div>
                     <button onClick={() => deleteInterceptor(i.id)}>🗑️</button>
                   </div>
@@ -323,32 +316,32 @@ export function DevProxyWidget() {
                     className="save rounded font-semibold text-white px-1 hover:bg-gray-500 bg-gray-600"
                     onClick={async () => {
                       try {
-                        const parsed = JSON.parse(responseText);
+                        const parsedBody = JSON.parse(responseText);
                         setJsonError(false);
+                        
+                        const payload = {
+                          method: interceptorEdited.method,
+                          path: interceptorEdited.path,
+                          querykey: interceptorEdited.querykey,
+                          isRegex: interceptorEdited.isRegex,
+                          response: {
+                            ...interceptorEdited.response,
+                            body: parsedBody
+                          }
+                        };
+
                         if (isCreating) {
-                          await createInterceptor(
-                            interceptorEdited.path,
-                            interceptorEdited.querykey,
-                            parsed,
-                          );
+                          await createInterceptor(payload);
                           setIsCreating(false);
                         } else {
                           await updateInterceptor(
                             interceptorEdited.id,
-                            interceptorEdited.path,
-                            interceptorEdited.querykey,
-                            parsed,
+                            payload
                           );
                         }
                         setInterceptorEdited(null);
-                        /*
-                          updateInterceptor(
-                          interceptorEdited.id,
-                          interceptorEdited.path,
-                          parsed,
-                          );
-                         */
-                      } catch {
+                      } catch (e) {
+                        console.error("Save error", e);
                         setJsonError(true);
                       }
                     }}
@@ -358,28 +351,50 @@ export function DevProxyWidget() {
                   <span className="interceptor-id">{interceptorEdited.id}</span>
                 </div>
                 <div className="interceptor-fields">
-                  <div className="interceptor-field key">
+                  <div className="interceptor-field">
                     <label className="mr-2 my-1 text-white font-semibold">
-                      querykey (',' comma-separated string[])
+                      method
                     </label>
-                    <input
-                      className="w-full"
-                      type="text"
-                      value={interceptorEdited.querykey || ""}
+                    <select
+                      className="bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      value={interceptorEdited.method || "ANY"}
                       onChange={(e) => {
                         const v = e.target.value;
                         setInterceptorEdited((prev) =>
-                          prev ? { ...prev, querykey: v.split(',') } : prev,
+                          prev ? { ...prev, method: v } : prev,
                         );
                       }}
-                    />
+                    >
+                      <option value="ANY">ANY</option>
+                      <option value="GET">GET</option>
+                      <option value="POST">POST</option>
+                      <option value="PUT">PUT</option>
+                      <option value="DELETE">DELETE</option>
+                      <option value="PATCH">PATCH</option>
+                    </select>
+
+                    <label className="ml-4 mr-2 my-1 text-white font-semibold flex items-center">
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={interceptorEdited.isRegex || false}
+                        onChange={(e) => {
+                          const v = e.target.checked;
+                          setInterceptorEdited((prev) =>
+                            prev ? { ...prev, isRegex: v } : prev,
+                          );
+                        }}
+                      />
+                      regex
+                    </label>
                   </div>
+
                   <div className="interceptor-field path">
                     <label className="mr-2 my-1 text-white font-semibold">
                       path
                     </label>
                     <input
-                      className="w-full"
+                      className="w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
                       type="text"
                       value={interceptorEdited.path}
                       onChange={(e) => {
@@ -390,15 +405,67 @@ export function DevProxyWidget() {
                       }}
                     />
                   </div>
-                  <div className="interceptor-field response">
+
+                  <div className="interceptor-field key">
                     <label className="mr-2 my-1 text-white font-semibold">
-                      response
+                      querykey
+                    </label>
+                    <input
+                      className="w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      type="text"
+                      placeholder="key1, key2"
+                      value={interceptorEdited.querykey ? interceptorEdited.querykey.join(',') : ""}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setInterceptorEdited((prev) =>
+                          prev ? { ...prev, querykey: v.split(',').map(s => s.trim()).filter(Boolean) } : prev,
+                        );
+                      }}
+                    />
+                  </div>
+
+                  <div className="interceptor-field response-meta">
+                    <label className="mr-2 my-1 text-white font-semibold">
+                      status
+                    </label>
+                    <input
+                      className="w-20 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      type="number"
+                      value={interceptorEdited.response.status}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value, 10);
+                        setInterceptorEdited((prev) =>
+                          prev ? { ...prev, response: { ...prev.response, status: v } } : prev,
+                        );
+                      }}
+                    />
+
+                    <label className="ml-4 mr-2 my-1 text-white font-semibold">
+                      delay (ms)
+                    </label>
+                    <input
+                      className="w-24 bg-gray-800 text-white border border-white/20 rounded px-2 py-1"
+                      type="number"
+                      value={interceptorEdited.response.delayMs || 0}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value, 10);
+                        setInterceptorEdited((prev) =>
+                          prev ? { ...prev, response: { ...prev.response, delayMs: v } } : prev,
+                        );
+                      }}
+                    />
+                  </div>
+
+                  <div className="interceptor-field response-body h-full flex flex-col">
+                    <label className="mr-2 my-1 text-white font-semibold">
+                      body (JSON)
                     </label>
                     <textarea
                       cols={60}
-                      rows={16}
+                      rows={12}
                       className={
-                        (jsonError ? "border border-red-500" : "") + " h-full"
+                        (jsonError ? "border-red-500" : "border-white/20") + 
+                        " w-full bg-gray-800 text-white border rounded px-2 py-1 font-mono text-xs flex-1"
                       }
                       value={responseText}
                       onChange={(e) => {
