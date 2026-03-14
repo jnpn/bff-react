@@ -54,29 +54,55 @@
   animation: slideIn 0.2s;
 }
 
-.interceptor-editor {
-}
 
 .interceptor-fields {
     display: flex;
     flex-direction: column;
-    padding: 4px;
+    gap: 16px;
+    margin-top: 8px;
 }
 
 .interceptor-field {
-    margin-bottom: 4px;
     display: flex;
-    gap: 2em;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
 }
 
-.interceptor-field input:focus {
-    background-color: #eee;
+.interceptor-field.vertical {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
 }
 
 .interceptor-field label {
-    min-width: 3em;
-    min-width: 6em;
-    overflow: hidden;
+    flex: 0 0 80px;
+    text-align: right;
+    font-size: 11px;
+    padding-top: 6px;
+    opacity: 0.7;
+    margin: 0 !important;
+}
+
+.interceptor-field.flex-1 label {
+    flex: 0 0 60px;
+}
+
+.interceptor-field.vertical label {
+    text-align: left;
+    flex: none;
+    padding-top: 0;
+}
+
+.field-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.interceptor-field.vertical textarea {
+    min-height: 200px;
+    resize: vertical;
 }
 
 .interceptor-field input {
@@ -85,14 +111,66 @@
 }
 
 .save {
-    color: black;
-    padding: 2px 5px;
-    border-radius: 3px;
-    background-color: gold;
-    &:hover {
-        cursor:pointer;
-        background-color: yellow;
-    }
+    display: none; /* Replaced by .btn-save */
+}
+
+/* Button Utilities */
+.btn {
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.btn-action-primary {
+	background: rgba(16, 185, 129, 0.2);
+	color: #34d399;
+}
+
+.btn-action-secondary {
+	background: rgba(251, 191, 36, 0.2);
+	color: #fbbf24;
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
 
 .edit {
@@ -250,6 +328,38 @@
 .status-4 { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
 .status-5 { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
+.response-meta {
+  display: flex;
+  flex-direction: row !important;
+  gap: 16px;
+  align-items: center;
+}
+
+.response-body {
+  flex: 1;
+  min-height: 200px;
+}
+
+.interceptor-fields select,
+.interceptor-fields input[type="text"],
+.interceptor-fields input[type="number"],
+.interceptor-fields textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.interceptor-fields select:focus,
+.interceptor-fields input:focus,
+.interceptor-fields textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .badge {
   background: rgba(168, 85, 247, 0.2);
   color: #c084fc;
@@ -277,4 +387,85 @@
 
 .request.intercepted {
   border-left: 3px solid #a78bfa;
+}
+
+/* Validation Errors */
+.error-message {
+  color: #f87171;
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.save.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.save.disabled:hover {
+  background-color: #4b5563; /* Same as bg-gray-600 */
+}
+
+.saved-feedback {
+  color: #10b981;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: 8px;
+  animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 0; transform: translateX(-5px); }
+  10% { opacity: 1; transform: translateX(0); }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.method-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: fit-content;
+}
+
+.method-selector .btn {
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.method-selector .btn.active {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.left {
+    min-width: 28vw;
+    max-width: 40vw;
+}
+
+.right {
+    min-width: 0;
+    max-width: 55vw;
+    transition: min-width 0.3s ease;
+    overflow: hidden;
+}
+
+.right.is-editing {
+    min-width: 32vw;
 }
