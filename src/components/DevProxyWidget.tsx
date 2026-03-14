@@ -115,12 +115,13 @@ export function DevProxyWidget() {
   const updateInterceptor = async (
     id: string,
     path: string,
+    querykey: string[],
     response: object,
   ) => {
     await fetch(`${PROXY_URL}/__interceptors/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path, response }),
+      body: JSON.stringify({ path, querykey, response }),
     });
     invalidateInterceptorLocally(id);
     loadInterceptors();
@@ -335,6 +336,7 @@ export function DevProxyWidget() {
                           await updateInterceptor(
                             interceptorEdited.id,
                             interceptorEdited.path,
+                            interceptorEdited.querykey,
                             parsed,
                           );
                         }
