@@ -251,7 +251,7 @@ export function DevProxyWidget() {
                         {i.response.status}
                       </span>
                       <span
-                        className={`status status-4`}
+                        className={`edit status status-4`}
                         onClick={() => {
                           if (
                             interceptorEdited === null ||
@@ -305,7 +305,7 @@ export function DevProxyWidget() {
                 <div className="actions">
                   <span
                     className="save rounded font-semibold text-white px-1 hover:bg-gray-500 bg-gray-600"
-                    onClick={() => {
+                    onClick={async () => {
                       try {
                         const parsed = JSON.parse(responseText);
                         setJsonError(false);
@@ -338,10 +338,10 @@ export function DevProxyWidget() {
                   >
                     save
                   </span>{" "}
-                  {interceptorEdited.id}
+                  <span className="interceptor-id">{interceptorEdited.id}</span>
                 </div>
                 <div className="interceptor-fields">
-                  <div className="interceptor-field-path">
+                  <div className="interceptor-field key">
                     <label className="mr-2 my-1 text-white font-semibold">
                       querykey (',' comma-separated string[])
                     </label>
@@ -356,6 +356,8 @@ export function DevProxyWidget() {
                         );
                       }}
                     />
+                  </div>
+                  <div className="interceptor-field path">
                     <label className="mr-2 my-1 text-white font-semibold">
                       path
                     </label>
@@ -371,7 +373,7 @@ export function DevProxyWidget() {
                       }}
                     />
                   </div>
-                  <div className="interceptor-field-response">
+                  <div className="interceptor-field response">
                     <label className="mr-2 my-1 text-white font-semibold">
                       response
                     </label>

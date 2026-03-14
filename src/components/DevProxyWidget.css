@@ -57,6 +57,57 @@
 .interceptor-editor {
 }
 
+.interceptor-fields {
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+}
+
+.interceptor-field {
+    margin-bottom: 4px;
+    display: flex;
+    gap: 2em;
+}
+
+.interceptor-field input:focus {
+    background-color: #eee;
+}
+
+.interceptor-field label {
+    min-width: 3em;
+    min-width: 6em;
+    overflow: hidden;
+}
+
+.interceptor-field input {
+    width: 100%;
+    padding-left: 1em;
+}
+
+.save {
+    color: black;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: gold;
+    &:hover {
+        cursor:pointer;
+        background-color: yellow;
+    }
+}
+
+.edit {
+    &:hover {
+        background-color: rgba(251, 191, 36, 0.3);
+        cursor:pointer;
+    }
+}
+
+.interceptor-id {
+    margin-left: 1em;
+    color: white;
+    font-weight: bold;
+}
+
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
