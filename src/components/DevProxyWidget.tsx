@@ -91,18 +91,9 @@ export const DevProxyWidget = () => {
     }
   };
 
-  const invalidateInterceptorLocally = (id: string) => {
-    const updatedInterceptor = interceptors.filter((i) => i.id === id)[0];
-    console.log("debug:updatedInterceptor", updatedInterceptor, "found?");
-    if (updatedInterceptor) {
-      const { querykey } = updatedInterceptor;
-      console.log(
-        "debug:updatedInterceptor",
-        querykey,
-        "of",
-        updatedInterceptor,
-        "invalidation",
-      );
+  const invalidateInterceptorLocally = (querykey?: string[]) => {
+    if (querykey && querykey.length > 0) {
+      console.log("debug:invalidating", querykey);
       queryClient.invalidateQueries({ queryKey: querykey });
     }
   };
@@ -126,6 +117,7 @@ export const DevProxyWidget = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(interceptor),
     });
+    invalidateInterceptorLocally(interceptor.querykey);
     loadInterceptors();
   };
 
@@ -149,7 +141,7 @@ export const DevProxyWidget = () => {
         await createInterceptor(payload);
         setIsCreating(false);
       } else {
-        await updateInterceptor(interceptorEdited.id, payload);
+        await updateInterceptor(interceptorEdited.id, payload, initialInterceptor?.querykey);
       }
       setShowSavedFeedback(true);
       setTimeout(() => setShowSavedFeedback(false), 2000);
@@ -165,33 +157,37 @@ export const DevProxyWidget = () => {
   };
 
   // Toggle interceptor
-  const toggleInterceptor = async (id: string, enabled: boolean) => {
+  const toggleInterceptor = async (id: string, enabled: boolean, querykey?: string[]) => {
     await fetch(`${PROXY_URL}/__interceptors/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enabled }),
     });
-    invalidateInterceptorLocally(id);
+    invalidateInterceptorLocally(querykey);
     loadInterceptors();
   };
 
   // Update interceptor
   const updateInterceptor = async (
     id: string,
-    updates: Partial<Interceptor>
+    updates: Partial<Interceptor>,
+    oldQuerykey?: string[]
   ) => {
     await fetch(`${PROXY_URL}/__interceptors/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
     });
-    invalidateInterceptorLocally(id);
+    // Invalidate both old and new keys to be safe
+    if (oldQuerykey) invalidateInterceptorLocally(oldQuerykey);
+    if (updates.querykey) invalidateInterceptorLocally(updates.querykey);
     loadInterceptors();
   };
 
   // Delete interceptor
-  const deleteInterceptor = async (id: string) => {
+  const deleteInterceptor = async (id: string, querykey?: string[]) => {
     await fetch(`${PROXY_URL}/__interceptors/${id}`, { method: "DELETE" });
+    invalidateInterceptorLocally(querykey);
     loadInterceptors();
   };
 
@@ -340,7 +336,7 @@ export const DevProxyWidget = () => {
                       type="checkbox"
                       checked={i.enabled}
                       onChange={(e) =>
-                        toggleInterceptor(i.id, e.target.checked)
+                        toggleInterceptor(i.id, e.target.checked, i.querykey)
                       }
                     />
                     <div className="interceptor-info">
@@ -394,7 +390,7 @@ export const DevProxyWidget = () => {
                       {i.isRegex && <span className="badge">REGEX</span>}
                       <span>key {i.querykey && i.querykey.length > 0 ? i.querykey.join(',') : "none"}</span>
                     </div>
-                    <button className="btn btn-danger" onClick={() => deleteInterceptor(i.id)}>🗑️</button>
+                    <button className="btn btn-danger" onClick={() => deleteInterceptor(i.id, i.querykey)}>🗑️</button>
                   </div>
                 ))}
               </div>
