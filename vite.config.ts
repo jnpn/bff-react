@@ -11,7 +11,7 @@ export default defineConfig({
       fileName: (format) => `bff-react-lib.${format}.js`,
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: ["react", "react-dom", "@tanstack/react-query"],
       output: {
         globals: {
           react: "React",
