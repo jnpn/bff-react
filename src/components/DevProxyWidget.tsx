@@ -285,7 +285,7 @@ export const DevProxyWidget = () => {
                   Interceptors ({interceptors.filter((i) => i.enabled).length})
                 </button>
                 <button
-                  className={(tab === "requests" ? "active" : "") + " hidden"}
+                  className={(tab === "requests" ? "active" : "")}
                   onClick={() => setTab("requests")}
                 >
                   Requests
