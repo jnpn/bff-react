@@ -149,12 +149,12 @@
 }
 
 .btn-action-primary {
-	background: rgba(16, 185, 129, 0.2);
-	color: #34d399;
+	background: #10a9b933 !important;
+	color: #34d3cc;
 }
 
 .btn-action-secondary {
-	background: rgba(251, 191, 36, 0.2);
+	background: rgba(251, 191, 36, 0.2) !important;
 	color: #fbbf24;
 }
 
