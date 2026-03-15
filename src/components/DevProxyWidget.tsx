@@ -53,8 +53,8 @@ export const DevProxyWidget = () => {
     if (!interceptorEdited || !initialInterceptor) return false;
 
     const methodChanged =
-      (interceptorEdited.method || "ANY") !==
-      (initialInterceptor.method || "ANY");
+      (interceptorEdited.method || "") !==
+      (initialInterceptor.method || "");
     const pathChanged = interceptorEdited.path !== initialInterceptor.path;
     const isRegexChanged =
       !!interceptorEdited.isRegex !== !!initialInterceptor.isRegex;
@@ -296,7 +296,7 @@ export const DevProxyWidget = () => {
     const newI = {
       id: "new",
       enabled: true,
-      method: "ANY",
+      method: "",
       path: "",
       querykey: [],
       response: { status: 200, body: {} },
@@ -497,7 +497,7 @@ export const DevProxyWidget = () => {
                             className={`btn ${interceptorEdited.method === m || (!interceptorEdited.method && m === "ANY") ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5`}
                             onClick={() => {
                               setInterceptorEdited((prev) =>
-                                prev ? { ...prev, method: m } : prev,
+                                prev ? { ...prev, method: m === "ANY" ? "" : m } : prev,
                               );
                             }}
                           >
