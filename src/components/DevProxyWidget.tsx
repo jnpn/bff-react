@@ -11,7 +11,7 @@ interface Interceptor {
   enabled: boolean;
   method?: string;
   path: string;
-  querykey: string[];
+  querykey: any[];
   isRegex?: boolean;
   response: {
     status: number;
@@ -44,6 +44,8 @@ export const DevProxyWidget = () => {
     useState<Interceptor | null>(null);
   const [responseText, setResponseText] = useState<string>("");
   const [initialResponseText, setInitialResponseText] = useState<string>("");
+  const [queryKeyText, setQueryKeyText] = useState<string>("");
+  const [initialQueryKeyText, setInitialQueryKeyText] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
@@ -62,9 +64,7 @@ export const DevProxyWidget = () => {
       (interceptorEdited.response.delayMs || 0) !==
       (initialInterceptor.response.delayMs || 0);
     const bodyChanged = responseText !== initialResponseText;
-    const querykeyChanged =
-      JSON.stringify(interceptorEdited.querykey || []) !==
-      JSON.stringify(initialInterceptor.querykey || []);
+    const querykeyChanged = queryKeyText !== initialQueryKeyText;
 
     return (
       methodChanged ||
@@ -125,11 +125,12 @@ export const DevProxyWidget = () => {
     if (!interceptorEdited || !validate() || !isDirty) return;
     try {
       const parsedBody = JSON.parse(responseText);
+      const parsedQueryKey = JSON.parse(queryKeyText);
 
       const payload = {
         method: interceptorEdited.method,
         path: interceptorEdited.path,
-        querykey: interceptorEdited.querykey,
+        querykey: parsedQueryKey,
         isRegex: interceptorEdited.isRegex,
         response: {
           ...interceptorEdited.response,
@@ -150,6 +151,7 @@ export const DevProxyWidget = () => {
         setInterceptorEdited(null);
         setInitialInterceptor(null);
         setInitialResponseText("");
+        setInitialQueryKeyText("");
       }, 1000);
     } catch (e) {
       console.error("Save error", e);
@@ -214,11 +216,13 @@ export const DevProxyWidget = () => {
       newErrors.path = "Path must start with /";
     }
 
-    if (
-      !interceptorEdited.querykey ||
-      interceptorEdited.querykey.some((k) => k.trim() === "")
-    ) {
-      newErrors.querykey = "All query keys must be non-empty strings";
+    try {
+      const qk = JSON.parse(queryKeyText);
+      if (!Array.isArray(qk)) {
+        newErrors.querykey = "Query key must be a JSON array";
+      }
+    } catch {
+      newErrors.querykey = "Invalid JSON array";
     }
 
     if (
@@ -302,6 +306,9 @@ export const DevProxyWidget = () => {
     const bodyStr = JSON.stringify({ status: 200, body: {} }, null, 2);
     setResponseText(bodyStr);
     setInitialResponseText(bodyStr);
+    const qkStr = JSON.stringify([], null, 2);
+    setQueryKeyText(qkStr);
+    setInitialQueryKeyText(qkStr);
     setErrors({});
   }}
 >
@@ -359,6 +366,9 @@ export const DevProxyWidget = () => {
                             const bodyStr = JSON.stringify(i.response.body, null, 2);
                             setResponseText(bodyStr);
                             setInitialResponseText(bodyStr);
+                            const qkStr = JSON.stringify(i.querykey || [], null, 2);
+                            setQueryKeyText(qkStr);
+                            setInitialQueryKeyText(qkStr);
                             setErrors({});
                           } else {
                             setInterceptorEdited(null);
@@ -382,6 +392,9 @@ export const DevProxyWidget = () => {
                           const bodyStr = JSON.stringify(i.response.body, null, 2);
                           setResponseText(bodyStr);
                           setInitialResponseText(bodyStr);
+                          const qkStr = JSON.stringify(i.querykey || [], null, 2);
+                          setQueryKeyText(qkStr);
+                          setInitialQueryKeyText(qkStr);
                           setErrors({});
                         }}
                       >
@@ -445,6 +458,7 @@ export const DevProxyWidget = () => {
                         if (initialInterceptor) {
                           setInterceptorEdited({ ...initialInterceptor });
                           setResponseText(initialResponseText);
+                          setQueryKeyText(initialQueryKeyText);
                           setErrors({});
                         }
                       }}
@@ -535,13 +549,10 @@ export const DevProxyWidget = () => {
                       <input
                         className={`w-full bg-gray-800 text-white border rounded px-2 py-1 ${errors.querykey ? "border-red-500" : "border-white/20"}`}
                         type="text"
-                        placeholder="key1, key2"
-                        value={interceptorEdited.querykey ? interceptorEdited.querykey.join(',') : ""}
+                        placeholder='["key1", 123, { "id": 1 }]'
+                        value={queryKeyText}
                         onChange={(e) => {
-                          const v = e.target.value;
-                          setInterceptorEdited((prev) =>
-                            prev ? { ...prev, querykey: v.split(',').map(s => s.trim()) } : prev,
-                          );
+                          setQueryKeyText(e.target.value);
                           if (errors.querykey) validate();
                         }}
                       />
