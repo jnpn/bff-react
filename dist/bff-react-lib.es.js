@@ -737,7 +737,7 @@ const M = "http://localhost:3000", mr = ["ANY", "GET", "POST", "PUT", "DELETE", 
             /* @__PURE__ */ n.jsx(
               "button",
               {
-                className: (O === "requests" ? "active" : "") + " hidden",
+                className: O === "requests" ? "active" : "",
                 onClick: () => k("requests"),
                 children: "Requests"
               }
