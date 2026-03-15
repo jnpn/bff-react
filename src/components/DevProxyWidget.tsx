@@ -51,6 +51,70 @@ export const DevProxyWidget = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
+  // History management
+  const [history, setHistory] = useState<Record<string, any[]>>(() => {
+    const saved = localStorage.getItem("interceptor_history");
+    try {
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
+  const saveToHistory = (interceptor: Interceptor, body: string, qk: string) => {
+    if (!interceptor.id || interceptor.id === "new") return;
+    
+    setHistory(prev => {
+      const entry = {
+        interceptor: { ...interceptor },
+        responseText: body,
+        queryKeyText: qk,
+        timestamp: new Date().toISOString()
+      };
+      
+      const newHistory = { ...prev };
+      const currentHistory = newHistory[interceptor.id] || [];
+      
+      // Don't save if it's identical to the most recent one
+      const lastEntry = currentHistory[0];
+      if (lastEntry && 
+          JSON.stringify(lastEntry.interceptor) === JSON.stringify(entry.interceptor) &&
+          lastEntry.responseText === entry.responseText &&
+          lastEntry.queryKeyText === entry.queryKeyText) {
+        return prev;
+      }
+
+      newHistory[interceptor.id] = [entry, ...currentHistory].slice(0, 50); // Keep last 50
+      localStorage.setItem("interceptor_history", JSON.stringify(newHistory));
+      return newHistory;
+    });
+  };
+
+  const navigateHistory = (direction: number) => {
+    if (!interceptorEdited) return;
+    const currentHist = history[interceptorEdited.id] || [];
+    if (currentHist.length === 0) return;
+
+    const newIndex = historyIndex + direction;
+    if (newIndex < -1 || newIndex >= currentHist.length) return;
+
+    setHistoryIndex(newIndex);
+    
+    if (newIndex === -1) {
+      if (initialInterceptor) {
+        setInterceptorEdited(initialInterceptor);
+        setResponseText(initialResponseText);
+        setQueryKeyText(initialQueryKeyText);
+      }
+    } else {
+      const entry = currentHist[newIndex];
+      setInterceptorEdited(entry.interceptor);
+      setResponseText(entry.responseText);
+      setQueryKeyText(entry.queryKeyText);
+    }
+  };
+
   const isDirty = (() => {
     if (!interceptorEdited || !initialInterceptor) return false;
 
@@ -145,6 +209,7 @@ export const DevProxyWidget = () => {
         setIsCreating(false);
       } else {
         await updateInterceptor(interceptorEdited.id, payload, initialInterceptor?.querykey);
+        saveToHistory(interceptorEdited, responseText, queryKeyText);
       }
       setShowSavedFeedback(true);
       setTimeout(() => setShowSavedFeedback(false), 2000);
@@ -154,6 +219,7 @@ export const DevProxyWidget = () => {
         setInitialInterceptor(null);
         setInitialResponseText("");
         setInitialQueryKeyText("");
+        setHistoryIndex(-1);
       }, 1000);
     } catch (e) {
       console.error("Save error", e);
@@ -312,6 +378,7 @@ export const DevProxyWidget = () => {
     setQueryKeyText(qkStr);
     setInitialQueryKeyText(qkStr);
     setErrors({});
+    setHistoryIndex(-1);
   }}
 >
   + New
@@ -372,9 +439,11 @@ export const DevProxyWidget = () => {
                             setQueryKeyText(qkStr);
                             setInitialQueryKeyText(qkStr);
                             setErrors({});
+                            setHistoryIndex(-1);
                           } else {
                             setInterceptorEdited(null);
                             setErrors({});
+                            setHistoryIndex(-1);
                           }
                         }}
                       >
@@ -398,6 +467,7 @@ export const DevProxyWidget = () => {
                           setQueryKeyText(qkStr);
                           setInitialQueryKeyText(qkStr);
                           setErrors({});
+                          setHistoryIndex(-1);
                         }}
                       >
                         Clone
@@ -462,6 +532,7 @@ export const DevProxyWidget = () => {
                           setResponseText(initialResponseText);
                           setQueryKeyText(initialQueryKeyText);
                           setErrors({});
+                          setHistoryIndex(-1);
                         }
                       }}
                     >
@@ -525,6 +596,32 @@ export const DevProxyWidget = () => {
                     </button>
                   </div>
                 </div>
+                {!isCreating && (
+                  <div className="history-navigator flex items-center justify-center gap-2 py-2 border-b border-white/5 mb-3">
+                    <button 
+                      className="btn btn-secondary !px-2 !py-0.5"
+                      title="Previous Version"
+                      disabled={!history[interceptorEdited.id] || historyIndex >= history[interceptorEdited.id].length - 1}
+                      onClick={() => navigateHistory(1)}
+                    >
+                      ←
+                    </button>
+                    <div className="flex flex-col items-center min-w-[80px]">
+                      <span className="text-[9px] font-bold opacity-50 uppercase tracking-tighter">History</span>
+                      <span className="text-[11px] font-mono font-bold text-blue-400">
+                        {historyIndex === -1 ? "LATEST" : `REV -${historyIndex + 1}`}
+                      </span>
+                    </div>
+                    <button 
+                      className="btn btn-secondary !px-2 !py-0.5"
+                      title="Next Version"
+                      disabled={historyIndex === -1}
+                      onClick={() => navigateHistory(-1)}
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
                 <div className="interceptor-fields">
                   {showRaw ? (
                     <div className="interceptor-field vertical h-full">
