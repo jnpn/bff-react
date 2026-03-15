@@ -1,9 +1,9 @@
 import re, { useState as p, useEffect as se } from "react";
 import { useQueryClient as ne } from "@tanstack/react-query";
-var z = { exports: {} }, Y = {};
+var z = { exports: {} }, J = {};
 var Z;
 function ae() {
-  if (Z) return Y;
+  if (Z) return J;
   Z = 1;
   var x = /* @__PURE__ */ Symbol.for("react.transitional.element"), E = /* @__PURE__ */ Symbol.for("react.fragment");
   function f(j, u, h) {
@@ -21,9 +21,9 @@ function ae() {
       props: h
     };
   }
-  return Y.Fragment = E, Y.jsx = f, Y.jsxs = f, Y;
+  return J.Fragment = E, J.jsx = f, J.jsxs = f, J;
 }
-var J = {};
+var Y = {};
 var ee;
 function oe() {
   return ee || (ee = 1, process.env.NODE_ENV !== "production" && (function() {
@@ -232,7 +232,7 @@ React keys must be passed directly to JSX without using spread:
       d,
       h
     )(), K = g(j(h)), X = {};
-    J.Fragment = N, J.jsx = function(t, a, l) {
+    Y.Fragment = N, Y.jsx = function(t, a, l) {
       var c = 1e4 > S.recentlyCreatedOwnerStacks++;
       return M(
         t,
@@ -242,7 +242,7 @@ React keys must be passed directly to JSX without using spread:
         c ? Error("react-stack-top-frame") : I,
         c ? g(j(t)) : K
       );
-    }, J.jsxs = function(t, a, l) {
+    }, Y.jsxs = function(t, a, l) {
       var c = 1e4 > S.recentlyCreatedOwnerStacks++;
       return M(
         t,
@@ -253,7 +253,7 @@ React keys must be passed directly to JSX without using spread:
         c ? g(j(t)) : K
       );
     };
-  })()), J;
+  })()), Y;
 }
 var te;
 function le() {
@@ -263,7 +263,7 @@ var r = le();
 const k = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", "PATCH"], pe = () => {
   const [x, E] = p(!1), [f, j] = p("interceptors"), [u, h] = p([]), [_, R] = p([]), [H, D] = p(!1), [M, O] = p(!1), [o, d] = p(null), [y, C] = p(null), [N, T] = p(""), [F, A] = p(""), [P, w] = p(""), [L, q] = p(""), [i, m] = p({}), [Q, W] = p(!1), S = (() => {
     if (!o || !y) return !1;
-    const e = (o.method || "ANY") !== (y.method || "ANY"), n = o.path !== y.path, s = !!o.isRegex != !!y.isRegex, b = o.response.status !== y.response.status, $ = (o.response.delayMs || 0) !== (y.response.delayMs || 0);
+    const e = (o.method || "") !== (y.method || ""), n = o.path !== y.path, s = !!o.isRegex != !!y.isRegex, b = o.response.status !== y.response.status, $ = (o.response.delayMs || 0) !== (y.response.delayMs || 0);
     return e || n || s || b || $ || N !== F || P !== L;
   })(), U = ne(), v = async () => {
     try {
@@ -401,7 +401,7 @@ const k = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                 const e = {
                   id: "new",
                   enabled: !0,
-                  method: "ANY",
+                  method: "",
                   path: "",
                   querykey: [],
                   response: { status: 200, body: {} }
@@ -563,7 +563,7 @@ const k = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                     className: `btn ${o.method === e || !o.method && e === "ANY" ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5`,
                     onClick: () => {
                       d(
-                        (n) => n && { ...n, method: e }
+                        (n) => n && { ...n, method: e === "ANY" ? "" : e }
                       );
                     },
                     children: e
