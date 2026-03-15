@@ -8,7 +8,10 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+## note: `dist` was here by default, but commented
+## to allow uploading dist/ on github
+## and be able to npm i github:... in another project
+# dist
 dist-ssr
 *.local
 

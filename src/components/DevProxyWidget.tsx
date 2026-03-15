@@ -31,7 +31,7 @@ interface RequestLog {
   duration: number;
 }
 
-export function DevProxyWidget() {
+export const DevProxyWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tab, setTab] = useState<"interceptors" | "requests">("interceptors");
   const [interceptors, setInterceptors] = useState<Interceptor[]>([]);

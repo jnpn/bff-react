@@ -1,1 +1,1 @@
-export * from "./components/DevProxyWidget";
+export { DevProxyWidget } from "./components/DevProxyWidget";
