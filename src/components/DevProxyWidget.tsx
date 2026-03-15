@@ -46,6 +46,8 @@ export const DevProxyWidget = () => {
   const [initialResponseText, setInitialResponseText] = useState<string>("");
   const [queryKeyText, setQueryKeyText] = useState<string>("");
   const [initialQueryKeyText, setInitialQueryKeyText] = useState<string>("");
+  const [showRaw, setShowRaw] = useState(false);
+  const [rawText, setRawText] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
 
@@ -476,10 +478,47 @@ export const DevProxyWidget = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
+                      className={`btn ${showRaw ? "btn-primary active" : "btn-secondary"}`}
+                      onClick={() => {
+                        if (!showRaw) {
+                          // Switching TO raw
+                          try {
+                            const full = {
+                              ...interceptorEdited,
+                              querykey: JSON.parse(queryKeyText),
+                              response: {
+                                ...interceptorEdited.response,
+                                body: JSON.parse(responseText)
+                              }
+                            };
+                            setRawText(JSON.stringify(full, null, 2));
+                          } catch {
+                             // If JSON is invalid, just use current state as is
+                             const full = { ...interceptorEdited, response: { ...interceptorEdited.response, body: responseText }, querykey: queryKeyText };
+                             setRawText(JSON.stringify(full, null, 2));
+                          }
+                        } else {
+                          // Switching FROM raw
+                          try {
+                            const parsed = JSON.parse(rawText);
+                            setInterceptorEdited(parsed);
+                            setResponseText(JSON.stringify(parsed.response?.body || {}, null, 2));
+                            setQueryKeyText(JSON.stringify(parsed.querykey || [], null, 2));
+                          } catch (e) {
+                            console.error("Invalid JSON in raw mode", e);
+                          }
+                        }
+                        setShowRaw(!showRaw);
+                      }}
+                    >
+                      {"{ }"} Raw
+                    </button>
+                    <button
                       className="btn btn-secondary"
                       onClick={() => {
                         setInterceptorEdited(null);
                         setErrors({});
+                        setShowRaw(false);
                       }}
                     >
                       Cancel
@@ -487,7 +526,32 @@ export const DevProxyWidget = () => {
                   </div>
                 </div>
                 <div className="interceptor-fields">
-                  <div className="interceptor-field">
+                  {showRaw ? (
+                    <div className="interceptor-field vertical h-full">
+                      <label>Raw JSON</label>
+                      <div className="field-content h-full">
+                        <textarea
+                          className="w-full bg-gray-800 text-white border border-white/20 rounded p-2 text-xs font-mono grow"
+                          style={{ height: "450px" }}
+                          value={rawText}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setRawText(v);
+                            try {
+                              const parsed = JSON.parse(v);
+                              setInterceptorEdited(parsed);
+                              if (parsed.response?.body) setResponseText(JSON.stringify(parsed.response.body, null, 2));
+                              if (parsed.querykey) setQueryKeyText(JSON.stringify(parsed.querykey, null, 2));
+                            } catch {
+                              // Ignore parse errors while typing
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="interceptor-field">
                     <label>method</label>
                     <div className="field-content">
                       <div className="method-selector flex gap-1 bg-white/5 p-1 rounded-md border border-white/10 w-fit">
@@ -626,6 +690,8 @@ export const DevProxyWidget = () => {
                       )}
                     </div>
                   </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
