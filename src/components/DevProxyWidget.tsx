@@ -257,7 +257,7 @@ export const DevProxyWidget = () => {
     return () => clearInterval(interval);
   }, [tab]);
 
-  if (!import.meta.env.DEV) return null;
+  // if (!import.meta.env.DEV) return null;
 
   return (
     <div className="dev-proxy-widget">
