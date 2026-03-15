@@ -91,7 +91,7 @@ export const DevProxyWidget = () => {
     }
   };
 
-  const invalidateInterceptorLocally = (querykey?: string[]) => {
+  const invalidateInterceptorLocally = (querykey?: any[]) => {
     if (querykey && querykey.length > 0) {
       console.log("debug:invalidating", querykey);
       queryClient.invalidateQueries({ queryKey: querykey });
@@ -401,7 +401,7 @@ export const DevProxyWidget = () => {
                         Clone
                       </button>
                       {i.isRegex && <span className="badge">REGEX</span>}
-                      <span>key {i.querykey && i.querykey.length > 0 ? i.querykey.join(',') : "none"}</span>
+                       <span>key {i.querykey && i.querykey.length > 0 ? JSON.stringify(i.querykey) : "none"}</span>
                     </div>
                     <button className="btn btn-danger" onClick={() => deleteInterceptor(i.id, i.querykey)}>🗑️</button>
                   </div>
