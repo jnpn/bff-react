@@ -1,377 +1,384 @@
-import re, { useState as f, useEffect as se } from "react";
+import re, { useState as p, useEffect as se } from "react";
 import { useQueryClient as ne } from "@tanstack/react-query";
 var z = { exports: {} }, Y = {};
-var Q;
+var Z;
 function ae() {
-  if (Q) return Y;
-  Q = 1;
-  var h = /* @__PURE__ */ Symbol.for("react.transitional.element"), g = /* @__PURE__ */ Symbol.for("react.fragment");
-  function u(b, i, p) {
-    var N = null;
-    if (p !== void 0 && (N = "" + p), i.key !== void 0 && (N = "" + i.key), "key" in i) {
-      p = {};
-      for (var k in i)
-        k !== "key" && (p[k] = i[k]);
-    } else p = i;
-    return i = p.ref, {
-      $$typeof: h,
-      type: b,
-      key: N,
-      ref: i !== void 0 ? i : null,
-      props: p
+  if (Z) return Y;
+  Z = 1;
+  var x = /* @__PURE__ */ Symbol.for("react.transitional.element"), E = /* @__PURE__ */ Symbol.for("react.fragment");
+  function h(j, u, f) {
+    var _ = null;
+    if (f !== void 0 && (_ = "" + f), u.key !== void 0 && (_ = "" + u.key), "key" in u) {
+      f = {};
+      for (var R in u)
+        R !== "key" && (f[R] = u[R]);
+    } else f = u;
+    return u = f.ref, {
+      $$typeof: x,
+      type: j,
+      key: _,
+      ref: u !== void 0 ? u : null,
+      props: f
     };
   }
-  return Y.Fragment = g, Y.jsx = u, Y.jsxs = u, Y;
+  return Y.Fragment = E, Y.jsx = h, Y.jsxs = h, Y;
 }
-var D = {};
-var Z;
+var J = {};
+var ee;
 function oe() {
-  return Z || (Z = 1, process.env.NODE_ENV !== "production" && (function() {
-    function h(e) {
-      if (e == null) return null;
-      if (typeof e == "function")
-        return e.$$typeof === _ ? null : e.displayName || e.name || null;
-      if (typeof e == "string") return e;
-      switch (e) {
-        case x:
+  return ee || (ee = 1, process.env.NODE_ENV !== "production" && (function() {
+    function x(t) {
+      if (t == null) return null;
+      if (typeof t == "function")
+        return t.$$typeof === W ? null : t.displayName || t.name || null;
+      if (typeof t == "string") return t;
+      switch (t) {
+        case N:
           return "Fragment";
         case F:
           return "Profiler";
-        case E:
+        case T:
           return "StrictMode";
-        case B:
-          return "Suspense";
         case L:
+          return "Suspense";
+        case q:
           return "SuspenseList";
-        case y:
+        case Q:
           return "Activity";
       }
-      if (typeof e == "object")
-        switch (typeof e.tag == "number" && console.error(
+      if (typeof t == "object")
+        switch (typeof t.tag == "number" && console.error(
           "Received an unexpected object in getComponentNameFromType(). This is likely a bug in React. Please file an issue."
-        ), e.$$typeof) {
-          case T:
+        ), t.$$typeof) {
+          case O:
             return "Portal";
-          case l:
-            return e.displayName || "Context";
-          case w:
-            return (e._context.displayName || "Context") + ".Consumer";
-          case m:
-            var t = e.render;
-            return e = e.displayName, e || (e = t.displayName || t.name || "", e = e !== "" ? "ForwardRef(" + e + ")" : "ForwardRef"), e;
-          case A:
-            return t = e.displayName || null, t !== null ? t : h(e.type) || "Memo";
           case P:
-            t = e._payload, e = e._init;
+            return t.displayName || "Context";
+          case A:
+            return (t._context.displayName || "Context") + ".Consumer";
+          case w:
+            var a = t.render;
+            return t = t.displayName, t || (t = a.displayName || a.name || "", t = t !== "" ? "ForwardRef(" + t + ")" : "ForwardRef"), t;
+          case i:
+            return a = t.displayName || null, a !== null ? a : x(t.type) || "Memo";
+          case m:
+            a = t._payload, t = t._init;
             try {
-              return h(e(t));
+              return x(t(a));
             } catch {
             }
         }
       return null;
     }
-    function g(e) {
-      return "" + e;
+    function E(t) {
+      return "" + t;
     }
-    function u(e) {
+    function h(t) {
       try {
-        g(e);
-        var t = !1;
+        E(t);
+        var a = !1;
       } catch {
-        t = !0;
+        a = !0;
       }
-      if (t) {
-        t = console;
-        var s = t.error, a = typeof Symbol == "function" && Symbol.toStringTag && e[Symbol.toStringTag] || e.constructor.name || "Object";
-        return s.call(
-          t,
+      if (a) {
+        a = console;
+        var l = a.error, c = typeof Symbol == "function" && Symbol.toStringTag && t[Symbol.toStringTag] || t.constructor.name || "Object";
+        return l.call(
+          a,
           "The provided key is an unsupported type %s. This value must be coerced to a string before using it here.",
-          a
-        ), g(e);
+          c
+        ), E(t);
       }
     }
-    function b(e) {
-      if (e === x) return "<>";
-      if (typeof e == "object" && e !== null && e.$$typeof === P)
+    function j(t) {
+      if (t === N) return "<>";
+      if (typeof t == "object" && t !== null && t.$$typeof === m)
         return "<...>";
       try {
-        var t = h(e);
-        return t ? "<" + t + ">" : "<...>";
+        var a = x(t);
+        return a ? "<" + a + ">" : "<...>";
       } catch {
         return "<...>";
       }
     }
-    function i() {
-      var e = q.A;
-      return e === null ? null : e.getOwner();
+    function u() {
+      var t = S.A;
+      return t === null ? null : t.getOwner();
     }
-    function p() {
+    function f() {
       return Error("react-stack-top-frame");
     }
-    function N(e) {
-      if (W.call(e, "key")) {
-        var t = Object.getOwnPropertyDescriptor(e, "key").get;
-        if (t && t.isReactWarning) return !1;
+    function _(t) {
+      if (U.call(t, "key")) {
+        var a = Object.getOwnPropertyDescriptor(t, "key").get;
+        if (a && a.isReactWarning) return !1;
       }
-      return e.key !== void 0;
+      return t.key !== void 0;
     }
-    function k(e, t) {
-      function s() {
+    function R(t, a) {
+      function l() {
         V || (V = !0, console.error(
           "%s: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://react.dev/link/special-props)",
-          t
+          a
         ));
       }
-      s.isReactWarning = !0, Object.defineProperty(e, "key", {
-        get: s,
+      l.isReactWarning = !0, Object.defineProperty(t, "key", {
+        get: l,
         configurable: !0
       });
     }
     function H() {
-      var e = h(this.type);
-      return G[e] || (G[e] = !0, console.error(
+      var t = x(this.type);
+      return G[t] || (G[t] = !0, console.error(
         "Accessing element.ref was removed in React 19. ref is now a regular prop. It will be removed from the JSX Element type in a future release."
-      )), e = this.props.ref, e !== void 0 ? e : null;
+      )), t = this.props.ref, t !== void 0 ? t : null;
     }
-    function J(e, t, s, a, C, I) {
-      var o = s.ref;
-      return e = {
-        $$typeof: d,
-        type: e,
-        key: t,
-        props: s,
-        _owner: a
-      }, (o !== void 0 ? o : null) !== null ? Object.defineProperty(e, "ref", {
+    function D(t, a, l, c, e, n) {
+      var s = l.ref;
+      return t = {
+        $$typeof: y,
+        type: t,
+        key: a,
+        props: l,
+        _owner: c
+      }, (s !== void 0 ? s : null) !== null ? Object.defineProperty(t, "ref", {
         enumerable: !1,
         get: H
-      }) : Object.defineProperty(e, "ref", { enumerable: !1, value: null }), e._store = {}, Object.defineProperty(e._store, "validated", {
+      }) : Object.defineProperty(t, "ref", { enumerable: !1, value: null }), t._store = {}, Object.defineProperty(t._store, "validated", {
         configurable: !1,
         enumerable: !1,
         writable: !0,
         value: 0
-      }), Object.defineProperty(e, "_debugInfo", {
+      }), Object.defineProperty(t, "_debugInfo", {
         configurable: !1,
         enumerable: !1,
         writable: !0,
         value: null
-      }), Object.defineProperty(e, "_debugStack", {
+      }), Object.defineProperty(t, "_debugStack", {
         configurable: !1,
         enumerable: !1,
         writable: !0,
-        value: C
-      }), Object.defineProperty(e, "_debugTask", {
+        value: e
+      }), Object.defineProperty(t, "_debugTask", {
         configurable: !1,
         enumerable: !1,
         writable: !0,
-        value: I
-      }), Object.freeze && (Object.freeze(e.props), Object.freeze(e)), e;
+        value: n
+      }), Object.freeze && (Object.freeze(t.props), Object.freeze(t)), t;
     }
-    function M(e, t, s, a, C, I) {
-      var o = t.children;
-      if (o !== void 0)
-        if (a)
-          if (U(o)) {
-            for (a = 0; a < o.length; a++)
-              R(o[a]);
-            Object.freeze && Object.freeze(o);
+    function M(t, a, l, c, e, n) {
+      var s = a.children;
+      if (s !== void 0)
+        if (c)
+          if (v(s)) {
+            for (c = 0; c < s.length; c++)
+              C(s[c]);
+            Object.freeze && Object.freeze(s);
           } else
             console.error(
               "React.jsx: Static children should always be an array. You are likely explicitly calling React.jsxs or React.jsxDEV. Use the Babel transform instead."
             );
-        else R(o);
-      if (W.call(t, "key")) {
-        o = h(e);
-        var O = Object.keys(t).filter(function(te) {
-          return te !== "key";
+        else C(s);
+      if (U.call(a, "key")) {
+        s = x(t);
+        var b = Object.keys(a).filter(function(B) {
+          return B !== "key";
         });
-        a = 0 < O.length ? "{key: someKey, " + O.join(": ..., ") + ": ...}" : "{key: someKey}", S[o + a] || (O = 0 < O.length ? "{" + O.join(": ..., ") + ": ...}" : "{}", console.error(
+        c = 0 < b.length ? "{key: someKey, " + b.join(": ..., ") + ": ...}" : "{key: someKey}", X[s + c] || (b = 0 < b.length ? "{" + b.join(": ..., ") + ": ...}" : "{}", console.error(
           `A props object containing a "key" prop is being spread into JSX:
   let props = %s;
   <%s {...props} />
 React keys must be passed directly to JSX without using spread:
   let props = %s;
   <%s key={someKey} {...props} />`,
-          a,
-          o,
-          O,
-          o
-        ), S[o + a] = !0);
+          c,
+          s,
+          b,
+          s
+        ), X[s + c] = !0);
       }
-      if (o = null, s !== void 0 && (u(s), o = "" + s), N(t) && (u(t.key), o = "" + t.key), "key" in t) {
-        s = {};
-        for (var K in t)
-          K !== "key" && (s[K] = t[K]);
-      } else s = t;
-      return o && k(
+      if (s = null, l !== void 0 && (h(l), s = "" + l), _(a) && (h(a.key), s = "" + a.key), "key" in a) {
+        l = {};
+        for (var $ in a)
+          $ !== "key" && (l[$] = a[$]);
+      } else l = a;
+      return s && R(
+        l,
+        typeof t == "function" ? t.displayName || t.name || "Unknown" : t
+      ), D(
+        t,
         s,
-        typeof e == "function" ? e.displayName || e.name || "Unknown" : e
-      ), J(
+        l,
+        u(),
         e,
-        o,
-        s,
-        i(),
-        C,
-        I
+        n
       );
     }
-    function R(e) {
-      n(e) ? e._store && (e._store.validated = 1) : typeof e == "object" && e !== null && e.$$typeof === P && (e._payload.status === "fulfilled" ? n(e._payload.value) && e._payload.value._store && (e._payload.value._store.validated = 1) : e._store && (e._store.validated = 1));
+    function C(t) {
+      o(t) ? t._store && (t._store.validated = 1) : typeof t == "object" && t !== null && t.$$typeof === m && (t._payload.status === "fulfilled" ? o(t._payload.value) && t._payload.value._store && (t._payload.value._store.validated = 1) : t._store && (t._store.validated = 1));
     }
-    function n(e) {
-      return typeof e == "object" && e !== null && e.$$typeof === d;
+    function o(t) {
+      return typeof t == "object" && t !== null && t.$$typeof === y;
     }
-    var c = re, d = /* @__PURE__ */ Symbol.for("react.transitional.element"), T = /* @__PURE__ */ Symbol.for("react.portal"), x = /* @__PURE__ */ Symbol.for("react.fragment"), E = /* @__PURE__ */ Symbol.for("react.strict_mode"), F = /* @__PURE__ */ Symbol.for("react.profiler"), w = /* @__PURE__ */ Symbol.for("react.consumer"), l = /* @__PURE__ */ Symbol.for("react.context"), m = /* @__PURE__ */ Symbol.for("react.forward_ref"), B = /* @__PURE__ */ Symbol.for("react.suspense"), L = /* @__PURE__ */ Symbol.for("react.suspense_list"), A = /* @__PURE__ */ Symbol.for("react.memo"), P = /* @__PURE__ */ Symbol.for("react.lazy"), y = /* @__PURE__ */ Symbol.for("react.activity"), _ = /* @__PURE__ */ Symbol.for("react.client.reference"), q = c.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, W = Object.prototype.hasOwnProperty, U = Array.isArray, $ = console.createTask ? console.createTask : function() {
+    var d = re, y = /* @__PURE__ */ Symbol.for("react.transitional.element"), O = /* @__PURE__ */ Symbol.for("react.portal"), N = /* @__PURE__ */ Symbol.for("react.fragment"), T = /* @__PURE__ */ Symbol.for("react.strict_mode"), F = /* @__PURE__ */ Symbol.for("react.profiler"), A = /* @__PURE__ */ Symbol.for("react.consumer"), P = /* @__PURE__ */ Symbol.for("react.context"), w = /* @__PURE__ */ Symbol.for("react.forward_ref"), L = /* @__PURE__ */ Symbol.for("react.suspense"), q = /* @__PURE__ */ Symbol.for("react.suspense_list"), i = /* @__PURE__ */ Symbol.for("react.memo"), m = /* @__PURE__ */ Symbol.for("react.lazy"), Q = /* @__PURE__ */ Symbol.for("react.activity"), W = /* @__PURE__ */ Symbol.for("react.client.reference"), S = d.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, U = Object.prototype.hasOwnProperty, v = Array.isArray, g = console.createTask ? console.createTask : function() {
       return null;
     };
-    c = {
-      react_stack_bottom_frame: function(e) {
-        return e();
+    d = {
+      react_stack_bottom_frame: function(t) {
+        return t();
       }
     };
-    var V, G = {}, X = c.react_stack_bottom_frame.bind(
-      c,
-      p
-    )(), j = $(b(p)), S = {};
-    D.Fragment = x, D.jsx = function(e, t, s) {
-      var a = 1e4 > q.recentlyCreatedOwnerStacks++;
+    var V, G = {}, I = d.react_stack_bottom_frame.bind(
+      d,
+      f
+    )(), K = g(j(f)), X = {};
+    J.Fragment = N, J.jsx = function(t, a, l) {
+      var c = 1e4 > S.recentlyCreatedOwnerStacks++;
       return M(
-        e,
         t,
-        s,
+        a,
+        l,
         !1,
-        a ? Error("react-stack-top-frame") : X,
-        a ? $(b(e)) : j
+        c ? Error("react-stack-top-frame") : I,
+        c ? g(j(t)) : K
       );
-    }, D.jsxs = function(e, t, s) {
-      var a = 1e4 > q.recentlyCreatedOwnerStacks++;
+    }, J.jsxs = function(t, a, l) {
+      var c = 1e4 > S.recentlyCreatedOwnerStacks++;
       return M(
-        e,
         t,
-        s,
+        a,
+        l,
         !0,
-        a ? Error("react-stack-top-frame") : X,
-        a ? $(b(e)) : j
+        c ? Error("react-stack-top-frame") : I,
+        c ? g(j(t)) : K
       );
     };
-  })()), D;
+  })()), J;
 }
-var ee;
+var te;
 function le() {
-  return ee || (ee = 1, process.env.NODE_ENV === "production" ? z.exports = ae() : z.exports = oe()), z.exports;
+  return te || (te = 1, process.env.NODE_ENV === "production" ? z.exports = ae() : z.exports = oe()), z.exports;
 }
 var r = le();
-const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", "PATCH"], ue = () => {
-  const [h, g] = f(!1), [u, b] = f("interceptors"), [i, p] = f([]), [N, k] = f([]), [H, J] = f(!1), [M, R] = f(!1), [n, c] = f(null), [d, T] = f(null), [x, E] = f(""), [F, w] = f(""), [l, m] = f({}), [B, L] = f(!1), A = (() => {
-    if (!n || !d) return !1;
-    const e = (n.method || "ANY") !== (d.method || "ANY"), t = n.path !== d.path, s = !!n.isRegex != !!d.isRegex, a = n.response.status !== d.response.status, C = (n.response.delayMs || 0) !== (d.response.delayMs || 0), I = x !== F, o = JSON.stringify(n.querykey || []) !== JSON.stringify(d.querykey || []);
-    return e || t || s || a || C || I || o;
-  })(), P = ne(), y = async () => {
+const k = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", "PATCH"], pe = () => {
+  const [x, E] = p(!1), [h, j] = p("interceptors"), [u, f] = p([]), [_, R] = p([]), [H, D] = p(!1), [M, C] = p(!1), [o, d] = p(null), [y, O] = p(null), [N, T] = p(""), [F, A] = p(""), [P, w] = p(""), [L, q] = p(""), [i, m] = p({}), [Q, W] = p(!1), S = (() => {
+    if (!o || !y) return !1;
+    const e = (o.method || "ANY") !== (y.method || "ANY"), n = o.path !== y.path, s = !!o.isRegex != !!y.isRegex, b = o.response.status !== y.response.status, $ = (o.response.delayMs || 0) !== (y.response.delayMs || 0);
+    return e || n || s || b || $ || N !== F || P !== L;
+  })(), U = ne(), v = async () => {
     try {
-      const t = await (await fetch(`${v}/__interceptors`)).json();
-      p(t), J(!0);
+      const n = await (await fetch(`${k}/__interceptors`)).json();
+      f(n), D(!0);
     } catch {
-      J(!1);
+      D(!1);
     }
-  }, _ = (e) => {
-    e && e.length > 0 && (console.log("debug:invalidating", e), P.invalidateQueries({ queryKey: e }));
-  }, q = async () => {
+  }, g = (e) => {
+    e && e.length > 0 && (console.log("debug:invalidating", e), U.invalidateQueries({ queryKey: e }));
+  }, V = async () => {
     try {
-      const t = await (await fetch(`${v}/__requests`)).json();
-      k(t.reverse());
+      const n = await (await fetch(`${k}/__requests`)).json();
+      R(n.reverse());
     } catch (e) {
       console.debug("debug:loadRequests", e);
     }
-  }, W = async (e) => {
-    await fetch(`${v}/__interceptors`, {
+  }, G = async (e) => {
+    await fetch(`${k}/__interceptors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(e)
-    }), _(e.querykey), y();
-  }, U = async () => {
-    if (!(!n || !j() || !A))
+    }), g(e.querykey), v();
+  }, I = async () => {
+    if (!(!o || !l() || !S))
       try {
-        const e = JSON.parse(x), t = {
-          method: n.method,
-          path: n.path,
-          querykey: n.querykey,
-          isRegex: n.isRegex,
+        const e = JSON.parse(N), n = JSON.parse(P), s = {
+          method: o.method,
+          path: o.path,
+          querykey: n,
+          isRegex: o.isRegex,
           response: {
-            ...n.response,
+            ...o.response,
             body: e
           }
         };
-        M ? (await W(t), R(!1)) : await V(n.id, t, d?.querykey), L(!0), setTimeout(() => L(!1), 2e3), m({}), setTimeout(() => {
-          c(null), T(null), w("");
+        M ? (await G(s), C(!1)) : await X(o.id, s, y?.querykey), W(!0), setTimeout(() => W(!1), 2e3), m({}), setTimeout(() => {
+          d(null), O(null), A(""), q("");
         }, 1e3);
       } catch (e) {
         console.error("Save error", e);
       }
-  }, $ = async (e, t, s) => {
-    await fetch(`${v}/__interceptors/${e}`, {
+  }, K = async (e, n, s) => {
+    await fetch(`${k}/__interceptors/${e}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enabled: t })
-    }), _(s), y();
-  }, V = async (e, t, s) => {
-    await fetch(`${v}/__interceptors/${e}`, {
+      body: JSON.stringify({ enabled: n })
+    }), g(s), v();
+  }, X = async (e, n, s) => {
+    await fetch(`${k}/__interceptors/${e}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(t)
-    }), s && _(s), t.querykey && _(t.querykey), y();
-  }, G = async (e, t) => {
-    await fetch(`${v}/__interceptors/${e}`, { method: "DELETE" }), _(t), y();
-  }, X = async (e, t) => {
-    await fetch(`${v}/__interceptors`, {
+      body: JSON.stringify(n)
+    }), s && g(s), n.querykey && g(n.querykey), v();
+  }, t = async (e, n) => {
+    await fetch(`${k}/__interceptors/${e}`, { method: "DELETE" }), g(n), v();
+  }, a = async (e, n) => {
+    await fetch(`${k}/__interceptors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         path: e,
-        response: { status: t, body: { error: "Simulated error" } }
+        response: { status: n, body: { error: "Simulated error" } }
       })
-    }), y();
-  }, j = () => {
+    }), v();
+  }, l = () => {
     const e = {};
-    if (!n) return !1;
-    !n.path || n.path.trim() === "" ? e.path = "Path is required" : n.path.startsWith("/") || (e.path = "Path must start with /"), (!n.querykey || n.querykey.some((t) => t.trim() === "")) && (e.querykey = "All query keys must be non-empty strings"), (n.response.status < 100 || n.response.status > 599) && (e.status = "Status must be between 100 and 599");
+    if (!o) return !1;
+    !o.path || o.path.trim() === "" ? e.path = "Path is required" : o.path.startsWith("/") || (e.path = "Path must start with /");
     try {
-      JSON.parse(x);
+      const n = JSON.parse(P);
+      Array.isArray(n) || (e.querykey = "Query key must be a JSON array");
+    } catch {
+      e.querykey = "Invalid JSON array";
+    }
+    (o.response.status < 100 || o.response.status > 599) && (e.status = "Status must be between 100 and 599");
+    try {
+      JSON.parse(N);
     } catch {
       e.body = "Invalid JSON body";
     }
     return m(e), Object.keys(e).length === 0;
-  }, S = async (e) => {
-    await fetch(`${v}/__scenarios/${e}/apply`, { method: "POST" }), y();
+  }, c = async (e) => {
+    await fetch(`${k}/__scenarios/${e}/apply`, { method: "POST" }), v();
   };
   return se(() => {
-    y();
+    v();
     const e = setInterval(() => {
-      y(), u === "requests" && q();
+      v(), h === "requests" && V();
     }, 2e3);
     return () => clearInterval(e);
-  }, [u]), /* @__PURE__ */ r.jsxs("div", { className: "dev-proxy-widget", children: [
+  }, [h]), /* @__PURE__ */ r.jsxs("div", { className: "dev-proxy-widget", children: [
     /* @__PURE__ */ r.jsxs(
       "button",
       {
         className: `dev-proxy-toggle ${H ? "connected" : "disconnected"}`,
-        onClick: () => g(!h),
+        onClick: () => E(!x),
         children: [
           /* @__PURE__ */ r.jsx("span", { className: "status-dot" }),
           "DEV PROXY"
         ]
       }
     ),
-    h && /* @__PURE__ */ r.jsxs("div", { className: "dev-proxy-panel flex-cols-2", children: [
+    x && /* @__PURE__ */ r.jsxs("div", { className: "dev-proxy-panel flex-cols-2", children: [
       /* @__PURE__ */ r.jsxs("div", { className: "left", children: [
         /* @__PURE__ */ r.jsxs("div", { className: "panel-header", children: [
           /* @__PURE__ */ r.jsxs("div", { className: "tabs", children: [
             /* @__PURE__ */ r.jsxs(
               "button",
               {
-                className: u === "interceptors" ? "active" : "",
-                onClick: () => b("interceptors"),
+                className: h === "interceptors" ? "active" : "",
+                onClick: () => j("interceptors"),
                 children: [
                   "Interceptors (",
-                  i.filter((e) => e.enabled).length,
+                  u.filter((e) => e.enabled).length,
                   ")"
                 ]
               }
@@ -379,8 +386,8 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
             /* @__PURE__ */ r.jsx(
               "button",
               {
-                className: (u === "requests" ? "active" : "") + " hidden",
-                onClick: () => b("requests"),
+                className: (h === "requests" ? "active" : "") + " hidden",
+                onClick: () => j("requests"),
                 children: "Requests"
               }
             )
@@ -390,7 +397,7 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
             {
               className: "new-btn",
               onClick: () => {
-                R(!0);
+                C(!0);
                 const e = {
                   id: "new",
                   enabled: !0,
@@ -399,21 +406,23 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   querykey: [],
                   response: { status: 200, body: {} }
                 };
-                c(e), T(e);
-                const t = JSON.stringify({ status: 200, body: {} }, null, 2);
-                E(t), w(t), m({});
+                d(e), O(e);
+                const n = JSON.stringify({ status: 200, body: {} }, null, 2);
+                T(n), A(n);
+                const s = JSON.stringify([], null, 2);
+                w(s), q(s), m({});
               },
               children: "+ New"
             }
           ),
-          /* @__PURE__ */ r.jsx("button", { className: "close-btn", onClick: () => g(!1), children: "x" })
+          /* @__PURE__ */ r.jsx("button", { className: "close-btn", onClick: () => E(!1), children: "x" })
         ] }),
         /* @__PURE__ */ r.jsxs("div", { className: "scenarios hidden!", children: [
-          /* @__PURE__ */ r.jsx("button", { onClick: () => S("happy-path"), children: "😊 Happy" }),
-          /* @__PURE__ */ r.jsx("button", { onClick: () => S("server-down"), children: "🚨 Down" }),
-          /* @__PURE__ */ r.jsx("button", { onClick: () => S("auth-expired"), children: "🔒 Auth" })
+          /* @__PURE__ */ r.jsx("button", { onClick: () => c("happy-path"), children: "😊 Happy" }),
+          /* @__PURE__ */ r.jsx("button", { onClick: () => c("server-down"), children: "🚨 Down" }),
+          /* @__PURE__ */ r.jsx("button", { onClick: () => c("auth-expired"), children: "🔒 Auth" })
         ] }),
-        u === "interceptors" && /* @__PURE__ */ r.jsx("div", { className: "interceptors-list", children: i.map((e) => /* @__PURE__ */ r.jsxs(
+        h === "interceptors" && /* @__PURE__ */ r.jsx("div", { className: "interceptors-list", children: u.map((e) => /* @__PURE__ */ r.jsxs(
           "div",
           {
             className: `interceptor ${e.enabled ? "enabled" : "disabled"}`,
@@ -423,7 +432,7 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                 {
                   type: "checkbox",
                   checked: e.enabled,
-                  onChange: (t) => $(e.id, t.target.checked, e.querykey)
+                  onChange: (n) => K(e.id, n.target.checked, e.querykey)
                 }
               ),
               /* @__PURE__ */ r.jsxs("div", { className: "interceptor-info", children: [
@@ -441,12 +450,14 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   {
                     className: "btn btn-action-primary",
                     onClick: () => {
-                      if (n === null || n.id !== e.id) {
-                        c(e), T(e);
-                        const t = JSON.stringify(e.response.body, null, 2);
-                        E(t), w(t), m({});
+                      if (o === null || o.id !== e.id) {
+                        d(e), O(e);
+                        const n = JSON.stringify(e.response.body, null, 2);
+                        T(n), A(n);
+                        const s = JSON.stringify(e.querykey || [], null, 2);
+                        w(s), q(s), m({});
                       } else
-                        c(null), m({});
+                        d(null), m({});
                     },
                     children: "Edit"
                   }
@@ -457,14 +468,16 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                     className: "btn btn-action-secondary",
                     title: "Clone Interceptor",
                     onClick: () => {
-                      R(!0);
-                      const t = {
+                      C(!0);
+                      const n = {
                         ...e,
                         id: "new"
                       };
-                      c(t), T(t);
+                      d(n), O(n);
                       const s = JSON.stringify(e.response.body, null, 2);
-                      E(s), w(s), m({});
+                      T(s), A(s);
+                      const b = JSON.stringify(e.querykey || [], null, 2);
+                      w(b), q(b), m({});
                     },
                     children: "Clone"
                   }
@@ -475,12 +488,12 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   e.querykey && e.querykey.length > 0 ? e.querykey.join(",") : "none"
                 ] })
               ] }),
-              /* @__PURE__ */ r.jsx("button", { className: "btn btn-danger", onClick: () => G(e.id, e.querykey), children: "🗑️" })
+              /* @__PURE__ */ r.jsx("button", { className: "btn btn-danger", onClick: () => t(e.id, e.querykey), children: "🗑️" })
             ]
           },
           e.id
         )) }),
-        u === "requests" && /* @__PURE__ */ r.jsx("div", { className: "requests-list", children: N.map((e) => /* @__PURE__ */ r.jsxs(
+        h === "requests" && /* @__PURE__ */ r.jsx("div", { className: "requests-list", children: _.map((e) => /* @__PURE__ */ r.jsxs(
           "div",
           {
             className: `request ${e.intercepted ? "intercepted" : "proxied"}`,
@@ -490,18 +503,18 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                 /* @__PURE__ */ r.jsx("span", { className: "url", children: e.url }),
                 e.intercepted && /* @__PURE__ */ r.jsx("span", { className: "badge", children: "MOCKED" })
               ] }),
-              !e.intercepted && /* @__PURE__ */ r.jsx("button", { onClick: () => X(e.url, 500), children: "âš¡500" })
+              !e.intercepted && /* @__PURE__ */ r.jsx("button", { onClick: () => a(e.url, 500), children: "âš¡500" })
             ]
           },
           e.id
         )) })
       ] }),
-      /* @__PURE__ */ r.jsx("div", { className: `right ${n ? "is-editing" : ""}`, children: n && /* @__PURE__ */ r.jsxs(
+      /* @__PURE__ */ r.jsx("div", { className: `right ${o ? "is-editing" : ""}`, children: o && /* @__PURE__ */ r.jsxs(
         "div",
         {
           className: "m-2 mt-2 mb-0 p-3 rounded border border-white/10 h-[95%] interceptor-editor bg-gray-900/50",
           onKeyDown: (e) => {
-            (e.ctrlKey || e.metaKey) && e.key === "Enter" && U();
+            (e.ctrlKey || e.metaKey) && e.key === "Enter" && I();
           },
           children: [
             /* @__PURE__ */ r.jsxs("div", { className: "editor-header", children: [
@@ -510,8 +523,8 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   "button",
                   {
                     className: "btn btn-primary",
-                    disabled: !A || Object.keys(l).length > 0,
-                    onClick: U,
+                    disabled: !S || Object.keys(i).length > 0,
+                    onClick: I,
                     children: "Save"
                   }
                 ),
@@ -520,22 +533,22 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   {
                     className: "btn btn-secondary",
                     style: { marginLeft: "1em" },
-                    disabled: !A,
+                    disabled: !S,
                     onClick: () => {
-                      d && (c({ ...d }), E(F), m({}));
+                      y && (d({ ...y }), T(F), w(L), m({}));
                     },
                     children: "Reset"
                   }
                 ),
-                B && /* @__PURE__ */ r.jsx("span", { className: "saved-feedback", children: "✓ Saved!" })
+                Q && /* @__PURE__ */ r.jsx("span", { className: "saved-feedback", children: "✓ Saved!" })
               ] }),
-              /* @__PURE__ */ r.jsx("div", { children: /* @__PURE__ */ r.jsx("span", { className: "text-[10px] opacity-80 font-semibold font-mono", children: n.id }) }),
+              /* @__PURE__ */ r.jsx("div", { children: /* @__PURE__ */ r.jsx("span", { className: "text-[10px] opacity-80 font-semibold font-mono", children: o.id }) }),
               /* @__PURE__ */ r.jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ r.jsx(
                 "button",
                 {
                   className: "btn btn-secondary",
                   onClick: () => {
-                    c(null), m({});
+                    d(null), m({});
                   },
                   children: "Cancel"
                 }
@@ -547,10 +560,10 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                 /* @__PURE__ */ r.jsx("div", { className: "field-content", children: /* @__PURE__ */ r.jsx("div", { className: "method-selector flex gap-1 bg-white/5 p-1 rounded-md border border-white/10 w-fit", children: ce.map((e) => /* @__PURE__ */ r.jsx(
                   "button",
                   {
-                    className: `btn ${n.method === e || !n.method && e === "ANY" ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5`,
+                    className: `btn ${o.method === e || !o.method && e === "ANY" ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5`,
                     onClick: () => {
-                      c(
-                        (t) => t && { ...t, method: e }
+                      d(
+                        (n) => n && { ...n, method: e }
                       );
                     },
                     children: e
@@ -566,23 +579,23 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                       "input",
                       {
                         autoFocus: !0,
-                        className: `flex-1 bg-gray-800 text-white border rounded px-2 py-1 ${l.path ? "border-red-500" : "border-white/20"}`,
+                        className: `flex-1 bg-gray-800 text-white border rounded px-2 py-1 ${i.path ? "border-red-500" : "border-white/20"}`,
                         type: "text",
-                        value: n.path,
+                        value: o.path,
                         onChange: (e) => {
-                          const t = e.target.value;
-                          c(
-                            (s) => s && { ...s, path: t }
-                          ), l.path && j();
+                          const n = e.target.value;
+                          d(
+                            (s) => s && { ...s, path: n }
+                          ), i.path && l();
                         }
                       }
                     ),
                     /* @__PURE__ */ r.jsx(
                       "button",
                       {
-                        className: `btn ${n.isRegex ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5 h-auto`,
+                        className: `btn ${o.isRegex ? "btn-primary active" : "btn-secondary"} !text-[10px] !px-2 !py-0.5 h-auto`,
                         onClick: () => {
-                          c(
+                          d(
                             (e) => e && { ...e, isRegex: !e.isRegex }
                           );
                         },
@@ -591,7 +604,7 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                       }
                     )
                   ] }),
-                  l.path && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: l.path })
+                  i.path && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: i.path })
                 ] })
               ] }),
               /* @__PURE__ */ r.jsxs("div", { className: "interceptor-field", children: [
@@ -600,19 +613,16 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   /* @__PURE__ */ r.jsx(
                     "input",
                     {
-                      className: `w-full bg-gray-800 text-white border rounded px-2 py-1 ${l.querykey ? "border-red-500" : "border-white/20"}`,
+                      className: `w-full bg-gray-800 text-white border rounded px-2 py-1 ${i.querykey ? "border-red-500" : "border-white/20"}`,
                       type: "text",
-                      placeholder: "key1, key2",
-                      value: n.querykey ? n.querykey.join(",") : "",
+                      placeholder: '["key1", 123, { "id": 1 }]',
+                      value: P,
                       onChange: (e) => {
-                        const t = e.target.value;
-                        c(
-                          (s) => s && { ...s, querykey: t.split(",").map((a) => a.trim()) }
-                        ), l.querykey && j();
+                        w(e.target.value), i.querykey && l();
                       }
                     }
                   ),
-                  l.querykey && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: l.querykey })
+                  i.querykey && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: i.querykey })
                 ] })
               ] }),
               /* @__PURE__ */ r.jsxs("div", { style: { display: "flex" }, className: "flex gap-4", children: [
@@ -623,20 +633,20 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                       "input",
                       {
                         type: "number",
-                        className: `bg-gray-800 text-white border rounded px-2 py-1 text-sm w-full ${l.status ? "border-red-500" : "border-white/20"}`,
-                        value: n.response.status,
+                        className: `bg-gray-800 text-white border rounded px-2 py-1 text-sm w-full ${i.status ? "border-red-500" : "border-white/20"}`,
+                        value: o.response.status,
                         onChange: (e) => {
-                          const t = parseInt(e.target.value, 10);
-                          c(
+                          const n = parseInt(e.target.value, 10);
+                          d(
                             (s) => s && {
                               ...s,
-                              response: { ...s.response, status: t }
+                              response: { ...s.response, status: n }
                             }
-                          ), l.status && j();
+                          ), i.status && l();
                         }
                       }
                     ),
-                    l.status && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: l.status })
+                    i.status && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: i.status })
                   ] })
                 ] }),
                 /* @__PURE__ */ r.jsxs("div", { className: "interceptor-field flex-1", children: [
@@ -646,13 +656,13 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                     {
                       type: "number",
                       className: "w-full bg-gray-800 text-white border border-white/20 rounded px-2 py-1",
-                      value: n.response.delayMs || 0,
+                      value: o.response.delayMs || 0,
                       onChange: (e) => {
-                        const t = parseInt(e.target.value, 10);
-                        c(
+                        const n = parseInt(e.target.value, 10);
+                        d(
                           (s) => s && {
                             ...s,
-                            response: { ...s.response, delayMs: t }
+                            response: { ...s.response, delayMs: n }
                           }
                         );
                       }
@@ -666,14 +676,14 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
                   /* @__PURE__ */ r.jsx(
                     "textarea",
                     {
-                      className: `w-full bg-gray-800 text-white border rounded p-2 text-xs font-mono h-40 ${l.body ? "border-red-500" : "border-white/20"}`,
-                      value: x,
+                      className: `w-full bg-gray-800 text-white border rounded p-2 text-xs font-mono h-40 ${i.body ? "border-red-500" : "border-white/20"}`,
+                      value: N,
                       onChange: (e) => {
-                        E(e.target.value), l.body && j();
+                        T(e.target.value), i.body && l();
                       }
                     }
                   ),
-                  l.body && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: l.body })
+                  i.body && /* @__PURE__ */ r.jsx("span", { className: "error-message", children: i.body })
                 ] })
               ] })
             ] })
@@ -684,5 +694,5 @@ const v = "http://localhost:3000", ce = ["ANY", "GET", "POST", "PUT", "DELETE", 
   ] });
 };
 export {
-  ue as DevProxyWidget
+  pe as DevProxyWidget
 };
